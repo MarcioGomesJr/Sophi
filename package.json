@@ -1,0 +1,21 @@
+{
+  "name": "txte",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "start": "nodemon index.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@discordjs/opus": "^0.3.3",
+    "discord.js": "^12.5.1",
+    "ffmpeg": "0.0.4",
+    "fluent-ffmpeg": "^2.1.2",
+    "nodemon": "^2.0.12",
+    "ytdl-core": "^4.4.4",
+    "ytdl-core-discord": "^1.2.5"
+  }
+}
