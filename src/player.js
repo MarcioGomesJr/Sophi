@@ -1,20 +1,47 @@
 
 const play  =  require('play-dl');
-const Sophi = require('discord.js');
-const { Intents } = require('discord.js');
-const client = new Sophi.Client({ intents: [Intents.FLAGS.GUILDS, Intents.FLAGS.GUILD_MESSAGES, Intents.FLAGS.GUILD_VOICE_STATES, Intents.FLAGS.DIRECT_MESSAGES] , partials : ['CHANNEL', 'MESSAGE']});
+const { joinVoiceChannel, createAudioPlayer, createAudioResource, NoSubscriberBehavior, StreamType, demuxProbe, AudioPlayerStatus, VoiceConnectionStatus, getVoiceConnection  } = require('@discordjs/voice');
 
+module.exports = {
 
-let search = await message.content.split(' ');
+    async player(message, playlists, audioPlayer){
+    
+        const connection = joinVoiceChannel({
+            channelId : message.member.voice.channel.id,
+            guildId : message.guild.id,
+            adapterCreator: message.guild.voiceAdapterCreator,
+        })
 
-let stream = await play.stream(search);
+        let search = message.content.substring(2);
+        let stream = null;
+        
+        playlists.push(search);
+        
+        if(playlists[0] !== null){
 
-let resource = createAudioResource(stream.stream, {
-        inputType: stream.type
-});
+            try{
+                stream = await play.stream(playlists[0])
+            }
 
-let audioPlayer = createAudioPlayer({
-    behaviors:{
-        noSubscriber: NoSubscriberBehavior.Play
-    }
-});
+            catch(TypeError){
+                let yt_info = await play.search(playlists[0], { limit : 1 })
+                stream = await play.stream(yt_info[0].url)
+                message.reply('Está tocando: ' + yt_info[0].url)
+            }
+
+            let resource = createAudioResource(stream.stream, {
+                inputType: stream.type
+            });
+            
+            audioPlayer.play(resource);
+            connection.subscribe(audioPlayer);
+
+            playlists.pop();
+         }
+    
+
+        if(message.content.startsWith('!stop')){
+            audioPlayer.stop(true);
+        }   
+    }  
+} 
