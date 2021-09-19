@@ -14,23 +14,14 @@ client.on('ready', () => {
     console.log(`Logged in as ${client.user.tag}!`);
 });
 
-let audioPlayer = createAudioPlayer({
-    behaviors:{
-    noSubscriber: NoSubscriberBehavior.Play
-    }
-});
 
 
 client.on('messageCreate', async message => {
-
-    if(message.content.startsWith('!') || message.content.startsWith('!stop')){
-
-        if (!message.member.voice?.channel) return message.channel.send('Você precisa estar conectado à uma sala de voz para fazer isto :s');
-        
-        player(message, playlists, audioPlayer);
-        
+    if(message.author.id === client.user.id || message.content[0] !== '!'){ 
+        return;
     }
-
+    player(message, playlists);
+    console.log(playlists);
 });
 
 
