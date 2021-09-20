@@ -10,18 +10,17 @@ const player  = require ('./src/player').player;
 const playlists = [];
 
 client.on('ready', () => {
-    client.user.setActivity('!ajuda para saber mais', { type: 'LISTENING'});
+    client.user.setActivity('indie babe uwu', { type: 'LISTENING'});
     console.log(`Logged in as ${client.user.tag}!`);
 });
 
 
 
 client.on('messageCreate', async message => {
-    if(message.author.id === client.user.id || message.content[0] !== '!'){ 
+    if(message.author.id === client.user.id || message.content[0] !== '-'){ 
         return;
     }
     player(message, playlists);
-    console.log(playlists);
 });
 
 

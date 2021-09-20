@@ -1,19 +1,20 @@
-
+const data = 'ytdl-core'
 const play  =  require('play-dl');
 const { joinVoiceChannel, createAudioPlayer, createAudioResource, NoSubscriberBehavior, StreamType, demuxProbe, AudioPlayerStatus, VoiceConnectionStatus, getVoiceConnection,  AudioPlayerPlayingState} = require('@discordjs/voice');
+
+let currentAudioPlayer = null 
 
 async function radin(playlists){
     const message = playlists[0];
     const audioPlayer = await playReq(message);
     audioPlayer.on(AudioPlayerStatus.Idle, (message) =>{
-        playlists.shift()
+        playlists.shift();
         if(playlists.length === 0) return;
         radin(playlists);
     })
 }
 
-async function playReq(message){
-        
+async function playReq(message){   
     const connection = joinVoiceChannel({
         channelId : message.member.voice.channel.id,
         guildId : message.guild.id,
@@ -26,18 +27,20 @@ async function playReq(message){
         }
     });
 
+    currentAudioPlayer = audioPlayer;
+
     let search = message.content.substring(3);
     let stream = null;
 
     
     try{
-        stream = await play.stream(search)
+        stream = await play.stream(search);
     }
 
     catch(TypeError){
-        let yt_info = await play.search(search, { limit : 1 })
-        stream = await play.stream(yt_info[0].url)
-        message.reply('Está tocando: ' + yt_info[0].url)
+        let yt_info = await play.search(search, { limit : 1 });
+        stream = await play.stream(yt_info[0].url);
+        message.reply('Está tocando: ' + yt_info[0].url);
     }
     
     let resource = createAudioResource(stream.stream, {
@@ -49,9 +52,10 @@ async function playReq(message){
     return audioPlayer;
 }
 
+
 module.exports = { 
     async player(message, playlists){
-        if(message.content.startsWith('!p')){
+        if(message.content.startsWith('-p ')){
             if (!message.member.voice?.channel) return message.channel.send('Você precisa estar conectado à uma sala de voz para fazer isto :s');
             playlists.push(message);
             
@@ -62,7 +66,24 @@ module.exports = {
             
             else{
                 message.reply('Sua música foi adicionada na queue');
+                
             }
         }
-    }
+        
+        if(message.content === '-p'){
+            
+            if(currentAudioPlayer.state.status === 'paused'){
+                console.log('fujnciona')
+                currentAudioPlayer.unpause();
+            }
+            
+            else{
+                currentAudioPlayer.pause();
+            }
+        }
+
+        if(message.content.startsWith('-s')){
+            currentAudioPlayer.stop();        
+        }  
+    }   
 }
