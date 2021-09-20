@@ -59,7 +59,6 @@ module.exports = {
             if (!message.member.voice?.channel) return message.channel.send('Você precisa estar conectado à uma sala de voz para fazer isto :s');
             playlists.push(message);
             
-
             if(playlists.length === 1){
                 radin(playlists);
             }
@@ -73,7 +72,6 @@ module.exports = {
         if(message.content === '-p'){
             
             if(currentAudioPlayer.state.status === 'paused'){
-                console.log('fujnciona')
                 currentAudioPlayer.unpause();
             }
             
