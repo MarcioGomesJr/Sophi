@@ -2,19 +2,19 @@ const data = 'ytdl-core'
 const play  =  require('play-dl');
 const { joinVoiceChannel, createAudioPlayer, createAudioResource, NoSubscriberBehavior, StreamType, demuxProbe, AudioPlayerStatus, VoiceConnectionStatus, getVoiceConnection,  AudioPlayerPlayingState} = require('@discordjs/voice');
 
-let currentAudioPlayer = null 
 
-async function radin(playlists){
+
+module.exports = async function radin(playlists, currentAudioPlayer){
     const message = playlists[0];
-    const audioPlayer = await playReq(message);
+    const audioPlayer = await playReq(message, currentAudioPlayer);
     audioPlayer.on(AudioPlayerStatus.Idle, (message) =>{
         playlists.shift();
         if(playlists.length === 0) return;
-        radin(playlists);
+        radin(playlists, currentAudioPlayer);
     })
 }
 
-async function playReq(message){   
+async function playReq(message, currentAudioPlayer){   
     const connection = joinVoiceChannel({
         channelId : message.member.voice.channel.id,
         guildId : message.guild.id,
@@ -27,7 +27,7 @@ async function playReq(message){
         }
     });
 
-    currentAudioPlayer = audioPlayer;
+    currentAudioPlayer['1'] = audioPlayer;
 
     let search = message.content.substring(3);
     let stream = null;
@@ -52,36 +52,3 @@ async function playReq(message){
     return audioPlayer;
 }
 
-
-module.exports = { 
-    async player(message, playlists){
-        if(message.content.startsWith('-p ')){
-            if (!message.member.voice?.channel) return message.channel.send('Você precisa estar conectado à uma sala de voz para fazer isto :s');
-            playlists.push(message);
-            
-            if(playlists.length === 1){
-                radin(playlists);
-            }
-            
-            else{
-                message.reply('Sua música foi adicionada na queue');
-                
-            }
-        }
-        
-        if(message.content === '-p'){
-            
-            if(currentAudioPlayer.state.status === 'paused'){
-                currentAudioPlayer.unpause();
-            }
-            
-            else{
-                currentAudioPlayer.pause();
-            }
-        }
-
-        if(message.content.startsWith('-s')){
-            currentAudioPlayer.stop();        
-        }  
-    }   
-}
