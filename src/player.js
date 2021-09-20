@@ -40,7 +40,7 @@ async function playReq(message, currentAudioPlayer){
     catch(TypeError){
         let yt_info = await play.search(search, { limit : 1 });
         stream = await play.stream(yt_info[0].url);
-        message.reply('Está tocando: ' + yt_info[0].url);
+        message.reply('Está tocando: ' + yt_info[0].title + ' (' + yt_info[0].url + ')');
     }
     
     let resource = createAudioResource(stream.stream, {
