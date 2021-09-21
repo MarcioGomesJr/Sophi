@@ -7,12 +7,14 @@ const { joinVoiceChannel, createAudioPlayer, createAudioResource, NoSubscriberBe
 const token  = require('./src/token').token;
 const skip = require('./src/skip');
 const pause = require('./src/pause');
-const playSong = require('./src/playSong')
+const playSong = require('./src/playSong');
+const lyrics = require('./src/lyrics');
 
 const playlists = [];
 const currentAudioPlayers = {
     '1': null,
 }; 
+const songName = {'1': null,};
 
 client.on('ready', () => {
     client.user.setActivity('indie babe uwu', { type: 'LISTENING'});
@@ -28,9 +30,10 @@ client.on('messageCreate', async message => {
 
     if (!message.member.voice?.channel) return message.channel.send('Você precisa estar conectado à uma sala de voz para fazer isto :s');
 
-    playSong(message, playlists, currentAudioPlayers);
+    playSong(message, playlists, currentAudioPlayers, songName);
     skip(currentAudioPlayers, message);
     pause(currentAudioPlayers, message);
+    lyrics(message, songName['1'])
 });
 
 

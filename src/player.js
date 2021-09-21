@@ -1,20 +1,24 @@
 const data = 'ytdl-core'
 const play  =  require('play-dl');
-const { joinVoiceChannel, createAudioPlayer, createAudioResource, NoSubscriberBehavior, StreamType, demuxProbe, AudioPlayerStatus, VoiceConnectionStatus, getVoiceConnection,  AudioPlayerPlayingState} = require('@discordjs/voice');
+const { joinVoiceChannel, createAudioPlayer, createAudioResource, 
+    NoSubscriberBehavior, StreamType, demuxProbe, 
+    AudioPlayerStatus, VoiceConnectionStatus, getVoiceConnection,  
+    AudioPlayerPlayingState } = require('@discordjs/voice');
 
 
 
-module.exports = async function radin(playlists, currentAudioPlayer){
+
+module.exports = async function radin(playlists, currentAudioPlayer, songName){
     const message = playlists[0];
-    const audioPlayer = await playReq(message, currentAudioPlayer);
+    const audioPlayer = await playReq(message, currentAudioPlayer, songName);
     audioPlayer.on(AudioPlayerStatus.Idle, (message) =>{
         playlists.shift();
         if(playlists.length === 0) return;
-        radin(playlists, currentAudioPlayer);
+        radin(playlists, currentAudioPlayer, songName);
     })
 }
 
-async function playReq(message, currentAudioPlayer){   
+async function playReq(message, currentAudioPlayer, songName){   
     const connection = joinVoiceChannel({
         channelId : message.member.voice.channel.id,
         guildId : message.guild.id,
@@ -35,12 +39,14 @@ async function playReq(message, currentAudioPlayer){
     
     try{
         stream = await play.stream(search);
+        songName['1'] = search;
     }
 
     catch(TypeError){
         let yt_info = await play.search(search, { limit : 1 });
         stream = await play.stream(yt_info[0].url);
-        message.reply('Está tocando: ' + yt_info[0].title + ' (' + yt_info[0].url + ')');
+        songName['1'] = yt_info[0].title;
+        message.reply('Está tocando: ' + songName['1'] + ' - ' + yt_info[0].url);
     }
     
     let resource = createAudioResource(stream.stream, {
