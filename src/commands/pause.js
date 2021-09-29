@@ -11,7 +11,7 @@ const pause = new Command(
     async (message, argument, serverPlayer) => {
         const currentAudioPlayer = serverPlayer.currentAudioPlayer;
         if (!currentAudioPlayer) {
-            message.channel.send('Não tem nada tocando ou pausado uwu');
+            message.reply('Não tem nada tocando ou pausado uwu');
             return;
         }
 
@@ -24,7 +24,7 @@ const pause = new Command(
             message.reply("PAUSO! O-o");
         }
         else {
-            message.channel.send('Não tem nada tocando ou pausado uwu');
+            message.reply('Não tem nada tocando ou pausado uwu');
         }
     }
 );

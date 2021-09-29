@@ -9,8 +9,14 @@ const skip = new Command(
     },
 
     async (message, argument, serverPlayer) => {
-        message.channel.send('Skiiiiiiiiiipooooo-desu vruuuuuuuuuuuuuuuuuuuuuuuuuuum!!!!');
-        serverPlayer.currentAudioPlayer.stop();
+        const currentAudioPlayer = serverPlayer.currentAudioPlayer;
+        if (!currentAudioPlayer) {
+            message.reply('Não tem nada tocando ou pausado uwu');
+            return;
+        }
+
+        message.reply('Skiiiiiiiiiipooooo-desu vruuuuuuuuuuuuuuuuuuuuuuuuuuum!!!!');
+        currentAudioPlayer.stop();
     }
 );
 
