@@ -1,5 +1,7 @@
 const radin = require('../player');
+const play  =  require('play-dl');
 const Command = require("../domain/Command");
+const PlaylistEntry = require('../domain/PlaylistEntry');
 
 const playSong = new Command(
     (message) => {
@@ -9,14 +11,16 @@ const playSong = new Command(
         return [false, ''];
     },
 
-    async (message, argument, playlists, currentAudioPlayer) => {
-        playlists.push(message);
+    async (message, argument, serverPlayer) => {
+        const ytInfo = (await play.search(argument, { limit : 1 }))[0];
+        const playlistEntry = new PlaylistEntry(message, ytInfo);
+        serverPlayer.playlist.push(playlistEntry);
 
-        if (playlists.length === 1) {
-            radin(playlists, currentAudioPlayer);
+        if (serverPlayer.playlist.length === 1) {
+            radin(serverPlayer);
         }
         else {
-            message.reply('Sua música foi adicionada na queue e.e');
+            message.reply('Sua música (' + ytInfo.title +  ') foi adicionada na queue e.e');
         }
     }
 );

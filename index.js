@@ -1,5 +1,6 @@
 const Sophi = require('discord.js');
 const { Intents } = require('discord.js');
+const ServerPlayer = require('./src/domain/ServerPlayer');
 const token  = require('./src/token').token;
 const skip = require('./src/commands/skip');
 const pause = require('./src/commands/pause');
@@ -10,10 +11,7 @@ const client = new Sophi.Client({
     partials : ['CHANNEL', 'MESSAGE'],
 });
 
-const playlists = [];
-const currentAudioPlayers = {
-    '1': null,
-};
+const serverPlayers = new Map();
 
 const allCommands = [pause, playSong, skip];
 
@@ -37,7 +35,13 @@ client.on('messageCreate', async message => {
             return message.reply('Você precisa estar conectado à uma sala de voz para fazer isto :s');
         }
 
-        command.execute(message, argument, playlists, currentAudioPlayers);
+        if (!serverPlayers.get(message.guildId)) {
+            serverPlayers.set(message.guildId, new ServerPlayer());
+        }
+
+        const serverPlayer = serverPlayers.get(message.guildId);
+
+        command.execute(message, argument, serverPlayer);
     });
 });
 

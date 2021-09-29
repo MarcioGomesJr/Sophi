@@ -8,17 +8,25 @@ const pause = new Command(
         return [false, ''];
     },
 
-    async (message, argument, playlists, currentAudioPlayer) => {
-        if (currentAudioPlayer['1'].state.status === 'paused') {
-            currentAudioPlayer['1'].unpause();
+    async (message, argument, serverPlayer) => {
+        const currentAudioPlayer = serverPlayer.currentAudioPlayer;
+        if (!currentAudioPlayer) {
+            message.channel.send('Não tem nada tocando ou pausado uwu');
+            return;
+        }
+
+        if (currentAudioPlayer.state.status === 'paused') {
+            currentAudioPlayer.unpause();
             message.reply("It's dare U-U");
         }
-        else {
-            currentAudioPlayer['1'].pause();
+        else if (currentAudioPlayer.state.status === 'playing') {
+            currentAudioPlayer.pause();
             message.reply("PAUSO! O-o");
+        }
+        else {
+            message.channel.send('Não tem nada tocando ou pausado uwu');
         }
     }
 );
-
 
 module.exports = pause;

@@ -8,9 +8,9 @@ const skip = new Command(
         return [false, ''];
     },
 
-    async (message, argument, playlists, currentAudioPlayer) => {
-        message.reply('Skiiiiiiiiiipooooo-desu vruuuuuuuuuuuuuuuuuuuuuuuuuuum!!!!');
-        currentAudioPlayer['1'].stop();
+    async (message, argument, serverPlayer) => {
+        message.channel.send('Skiiiiiiiiiipooooo-desu vruuuuuuuuuuuuuuuuuuuuuuuuuuum!!!!');
+        serverPlayer.currentAudioPlayer.stop();
     }
 );
 
