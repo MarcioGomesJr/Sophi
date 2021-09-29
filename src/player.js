@@ -1,20 +1,18 @@
-const data = 'ytdl-core'
 const play  =  require('play-dl');
-const { joinVoiceChannel, createAudioPlayer, createAudioResource, NoSubscriberBehavior, StreamType, demuxProbe, AudioPlayerStatus, VoiceConnectionStatus, getVoiceConnection,  AudioPlayerPlayingState} = require('@discordjs/voice');
+const { joinVoiceChannel, createAudioPlayer, createAudioResource, NoSubscriberBehavior, AudioPlayerStatus } = require('@discordjs/voice');
 
-
-
-module.exports = async function radin(playlists, currentAudioPlayer){
+module.exports = async function radin(playlists, currentAudioPlayer) {
     const message = playlists[0];
     const audioPlayer = await playReq(message, currentAudioPlayer);
-    audioPlayer.on(AudioPlayerStatus.Idle, (message) =>{
+
+    audioPlayer.on(AudioPlayerStatus.Idle, (message) => {
         playlists.shift();
         if(playlists.length === 0) return;
         radin(playlists, currentAudioPlayer);
     })
 }
 
-async function playReq(message, currentAudioPlayer){   
+async function playReq(message, currentAudioPlayer) {
     const connection = joinVoiceChannel({
         channelId : message.member.voice.channel.id,
         guildId : message.guild.id,
@@ -23,7 +21,7 @@ async function playReq(message, currentAudioPlayer){
 
     let audioPlayer = createAudioPlayer({
         behaviors:{
-        noSubscriber: NoSubscriberBehavior.Play
+            noSubscriber: NoSubscriberBehavior.Play
         }
     });
 
@@ -31,16 +29,16 @@ async function playReq(message, currentAudioPlayer){
 
     let search = message.content.substring(3);
     let stream = null;
-
     
-    try{
+    try {
         stream = await play.stream(search);
     }
-
-    catch(TypeError){
+    catch(TypeError) {
         let yt_info = await play.search(search, { limit : 1 });
-        stream = await play.stream(yt_info[0].url);
-        message.reply('Está tocando: ' + yt_info[0].title + ' (' + yt_info[0].url + ')');
+        let selectedSong = yt_info[0];
+
+        stream = await play.stream(selectedSong.url);
+        message.reply('Está tocando: ' + selectedSong.title + ' (' + selectedSong.url + ')');
     }
     
     let resource = createAudioResource(stream.stream, {
@@ -49,6 +47,6 @@ async function playReq(message, currentAudioPlayer){
     
     audioPlayer.play(resource);
     connection.subscribe(audioPlayer);
+
     return audioPlayer;
 }
-
