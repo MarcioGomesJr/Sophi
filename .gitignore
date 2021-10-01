@@ -1,3 +1,4 @@
 /.idea
 /node_modules
-/src/token.js 
+/src/token.js
+debug.log
