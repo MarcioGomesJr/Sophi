@@ -4,9 +4,9 @@ const Command = require("../domain/Command");
 const PlaylistEntry = require('../domain/PlaylistEntry');
 
 const playSong = new Command(
-    (message) => {
-        if (message.content.startsWith('-p ')) {
-            return [true, message.content.substring(3)];
+    (message, normalizedMessage) => {
+        if (normalizedMessage.startsWith('p ')) {
+            return [true, normalizedMessage.substring(2)];
         }
         return [false, ''];
     },
@@ -14,6 +14,7 @@ const playSong = new Command(
     async (message, argument, serverPlayer) => {
         const ytInfo = (await play.search(argument, { limit : 1 }))[0];
         const playlistEntry = new PlaylistEntry(message, ytInfo);
+
         serverPlayer.playlist.push(playlistEntry);
 
         if (serverPlayer.playlist.length === 1) {

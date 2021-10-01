@@ -10,7 +10,7 @@ module.exports = async function radin(serverPlayer) {
         playlist.shift();
         if(playlist.length === 0) return;
         radin(serverPlayer);
-    })
+    });
 }
 
 async function playReq(playlistEntry, serverPlayer) {
@@ -20,7 +20,7 @@ async function playReq(playlistEntry, serverPlayer) {
         channelId : message.member.voice.channel.id,
         guildId : message.guild.id,
         adapterCreator: message.guild.voiceAdapterCreator,
-    })
+    });
 
     const audioPlayer = createAudioPlayer({
         behaviors:{
@@ -33,7 +33,7 @@ async function playReq(playlistEntry, serverPlayer) {
     const selectedSong = playlistEntry.ytInfo;
     const stream = await play.stream(selectedSong.url);
 
-    message.reply('Está tocando: ' + selectedSong.title + ' (' + selectedSong.url + ')');
+    message.channel.send(`Está tocando: ${selectedSong.title} (${selectedSong.url})\nA pedido de: ${message.member.displayName}`);
     
     let resource = createAudioResource(stream.stream, {
         inputType: stream.type

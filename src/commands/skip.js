@@ -1,8 +1,8 @@
 const Command = require("../domain/Command");
 
 const skip = new Command(
-    (message) => {
-        if (message.content === '-s') {
+    (message, normalizedMessage) => {
+        if (normalizedMessage === 's') {
             return [true, ''];
         }
         return [false, ''];
@@ -11,11 +11,11 @@ const skip = new Command(
     async (message, argument, serverPlayer) => {
         const currentAudioPlayer = serverPlayer.currentAudioPlayer;
         if (!currentAudioPlayer) {
-            message.reply('Não tem nada tocando ou pausado uwu');
+            message.channel.send('Não tem nada tocando ou pausado uwu');
             return;
         }
 
-        message.reply('Skiiiiiiiiiipooooo-desu vruuuuuuuuuuuuuuuuuuuuuuuuuuum!!!!');
+        message.channel.send('Skiiiiiiiiiipooooo-desu vruuuuuuuuuuuuuuuuuuuuuuuuuuum!!!!');
         currentAudioPlayer.stop();
     }
 );

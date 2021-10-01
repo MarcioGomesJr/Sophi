@@ -24,9 +24,15 @@ client.on('messageCreate', async message => {
     if (message.author.id === client.user.id || message.content[0] !== '-') { 
         return;
     }
+    
+    if (!message.member) {
+        return message.channel.send('Sinto muito, só funciono em servidores! ewe');
+    }
+
+    const normalizedMessage = message.content.substring(1).toLowerCase();
 
     allCommands.forEach((command) => {
-        const [willExecute, argument] = command.shouldExecute(message)
+        const [willExecute, argument] = command.shouldExecute(message, normalizedMessage);
         if (!willExecute) {
             return;
         }
