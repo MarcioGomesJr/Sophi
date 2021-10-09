@@ -2,9 +2,11 @@ const Sophi = require('discord.js');
 const { Intents } = require('discord.js');
 const ServerPlayer = require('./src/domain/ServerPlayer');
 const token  = require('./src/token').token;
+
 const skip = require('./src/commands/skip');
 const pause = require('./src/commands/pause');
 const playSong = require('./src/commands/playSong');
+const queue = require('./src/commands/queue');
 
 const client = new Sophi.Client({
     intents: [Intents.FLAGS.GUILDS, Intents.FLAGS.GUILD_MESSAGES, Intents.FLAGS.GUILD_VOICE_STATES, Intents.FLAGS.DIRECT_MESSAGES],
@@ -13,7 +15,7 @@ const client = new Sophi.Client({
 
 const serverPlayers = new Map();
 
-const allCommands = [pause, playSong, skip];
+const allCommands = [pause, playSong, skip, queue];
 
 client.on('ready', () => {
     client.user.setActivity('indie babe uwu', { type: 'LISTENING'});
