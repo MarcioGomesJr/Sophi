@@ -1,0 +1,1 @@
+// Comando para manipular a playlist movendo elementos dela pelos indexes

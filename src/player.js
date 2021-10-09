@@ -1,19 +1,35 @@
-const play  =  require('play-dl');
+const play = require('play-dl');
 const { joinVoiceChannel, createAudioPlayer, createAudioResource, NoSubscriberBehavior, AudioPlayerStatus } = require('@discordjs/voice');
 
 module.exports = async function radin(serverPlayer) {
     const playlist = serverPlayer.playlist;
-    const playlistEntry = playlist[0];
+    const playlistEntry = serverPlayer.getCurrentEntry();
     const audioPlayer = await playReq(playlistEntry, serverPlayer);
 
-    audioPlayer.on(AudioPlayerStatus.Idle, (message) => {
-        playlist.shift();
-        if(playlist.length === 0) return;
+    serverPlayer.currentAudioPlayer = audioPlayer;
+
+    audioPlayer.on(AudioPlayerStatus.Idle, (oldState, newState) => {
+        if (playlistEntry.stopRadin) {
+            return;
+        }
+
+        serverPlayer.currentSongIndex++;
+
+        if (playlist.length === serverPlayer.currentSongIndex) {
+            return;
+        }
+
         radin(serverPlayer);
+    });
+
+    audioPlayer.on(AudioPlayerStatus.Buffering, (oldState, newState) => {
+        if (oldState.status === 'playing') {
+            console.log('Bugou?');
+        }
     });
 }
 
-async function playReq(playlistEntry, serverPlayer) {
+async function playReq(playlistEntry) {
     const message = playlistEntry.message;
 
     const connection = joinVoiceChannel({
@@ -24,11 +40,9 @@ async function playReq(playlistEntry, serverPlayer) {
 
     const audioPlayer = createAudioPlayer({
         behaviors:{
-            noSubscriber: NoSubscriberBehavior.Play
+            noSubscriber: NoSubscriberBehavior.Stop,
         }
     });
-
-    serverPlayer.currentAudioPlayer = audioPlayer;
 
     const selectedSong = playlistEntry.ytInfo;
     const stream = await play.stream(selectedSong.url);

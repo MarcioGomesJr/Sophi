@@ -19,7 +19,7 @@ const queue = new Command(
             const ytInfo = playlistEntry.ytInfo;
             acc += `${index + 1} - ${ytInfo.title}`;
 
-            if (index === 0) {
+            if (index === serverPlayer.currentSongIndex) {
                 acc += ' -> Tocando atualmente :3';
             }
 
