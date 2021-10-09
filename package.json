@@ -10,7 +10,6 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "@discordjs/opus": "^0.6.0",
     "@discordjs/voice": "^0.6.0",
     "discord-ytdl-core": "^5.0.4",
     "discord.js": "^13.1.0",
