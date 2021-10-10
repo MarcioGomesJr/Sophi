@@ -9,6 +9,10 @@ class ServerPlayer {
     getCurrentEntry() {
         return this.playlist[this.currentSongIndex];
     }
+
+    playlistHasEnded() {
+        return this.currentSongIndex >= this.playlist.length;
+    }
 }
 
 module.exports = ServerPlayer;

@@ -2,7 +2,6 @@ const play = require('play-dl');
 const { joinVoiceChannel, createAudioPlayer, createAudioResource, NoSubscriberBehavior, AudioPlayerStatus } = require('@discordjs/voice');
 
 module.exports = async function radin(serverPlayer) {
-    const playlist = serverPlayer.playlist;
     const playlistEntry = serverPlayer.getCurrentEntry();
     const audioPlayer = await playReq(playlistEntry, serverPlayer);
 
@@ -15,7 +14,7 @@ module.exports = async function radin(serverPlayer) {
 
         serverPlayer.currentSongIndex++;
 
-        if (playlist.length === serverPlayer.currentSongIndex) {
+        if (serverPlayer.playlistHasEnded()) {
             return;
         }
 
