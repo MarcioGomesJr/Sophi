@@ -1,0 +1,1 @@
+// Comando para o bot adicionar a música como próxima na playlist

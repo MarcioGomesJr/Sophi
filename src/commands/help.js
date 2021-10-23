@@ -1,0 +1,1 @@
+// Comando para mostrar o uso básico do bot

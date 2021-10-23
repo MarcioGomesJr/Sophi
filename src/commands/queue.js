@@ -17,10 +17,10 @@ const queue = new Command(
 
         const nextSongs = serverPlayer.playlist.reduce((acc, playlistEntry, index) => {
             const ytInfo = playlistEntry.ytInfo;
-            acc += `${index + 1} - ${ytInfo.title}`;
+            acc += `${index + 1} - ${ytInfo.title}\n${ytInfo.url}`;
 
-            if (index === 0) {
-                acc += ' -> Tocando atualmente :3';
+            if (index === serverPlayer.currentSongIndex) {
+                acc += ' **-> Tocando atualmente :3**';
             }
 
             return acc + '\n';
