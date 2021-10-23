@@ -39,7 +39,7 @@ async function playReq(playlistEntry) {
 
     const audioPlayer = createAudioPlayer({
         behaviors:{
-            noSubscriber: NoSubscriberBehavior.Stop,
+            noSubscriber: NoSubscriberBehavior.Play,
         }
     });
 

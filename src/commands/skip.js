@@ -19,15 +19,15 @@ const skip = new Command(
             return;
         }
 
-        if (serverPlayer.currentSongIndex + 1 < playlist.length) {
-            serverPlayer.getCurrentEntry().stopRadin = true;
-            serverPlayer.currentSongIndex++;
-    
+        serverPlayer.getCurrentEntry().stopRadin = true;
+        serverPlayer.currentSongIndex++;
+        currentAudioPlayer.stop();
+
+        if (!serverPlayer.playlistHasEnded()) {
             radin(serverPlayer);
-        }   
+        }
 
         message.channel.send('Skiiiiiiiiiipooooo-desu vruuuuuuuuuuuuuuuuuuuuuuuuuuum!!!!');
-        currentAudioPlayer.stop();
     }
 );
 
