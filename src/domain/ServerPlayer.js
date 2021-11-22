@@ -6,6 +6,14 @@ class ServerPlayer {
         this.currentSongIndex = 0;
     }
 
+    addToPlaylist(playlistEntry) {
+        return this.playlist.push(playlistEntry);
+    }
+
+    addToPlaylistNext(playlistEntry) {
+        return this.playlist.splice(this.currentSongIndex + 1, 0, playlistEntry);
+    }
+
     getCurrentEntry() {
         return this.playlist[this.currentSongIndex];
     }
