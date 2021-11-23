@@ -1,7 +1,4 @@
 const Command = require("../domain/Command");
-const radin = require('../player');
-const playSong = require("./playSong");
-
 const skip = new Command(
     (message, normalizedMessage) => {
         if (normalizedMessage === 's') {
@@ -12,20 +9,12 @@ const skip = new Command(
 
     async (message, argument, serverPlayer) => {
         const currentAudioPlayer = serverPlayer.currentAudioPlayer;
-        const playlist = serverPlayer.playlist;
 
         if (!currentAudioPlayer || serverPlayer.playlistHasEnded()) {
-            message.channel.send('Não tem nada tocando ou pausado uwu');
-            return;
+            return message.channel.send('Não tem nada tocando ou pausado uwu');
         }
 
-        serverPlayer.getCurrentEntry().stopRadin = true;
-        serverPlayer.currentSongIndex++;
-        currentAudioPlayer.stop();
-
-        if (!serverPlayer.playlistHasEnded()) {
-            radin(serverPlayer);
-        }
+        serverPlayer.skipToSong();
 
         message.channel.send('Skiiiiiiiiiipooooo-desu vruuuuuuuuuuuuuuuuuuuuuuuuuuum!!!!');
     }

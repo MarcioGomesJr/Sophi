@@ -4,8 +4,6 @@ const play  =  require('play-dl');
 const Command = require("../domain/Command");
 const PlaylistEntry = require('../domain/PlaylistEntry');
 
-const playNextRegex = new RegExp('^.+pn ', 'ig');
-
 const playSong = new Command(
     (message, normalizedMessage) => {
         if (normalizedMessage.startsWith('p ')) {
@@ -24,7 +22,7 @@ const playSong = new Command(
             return message.reply('Infelizmente sua pesquisa não foi encontrada ou não é um link de um vídeo no YouTube aa');
         }
 
-        const playNext = message.content.match(playNextRegex);
+        const playNext = /^.+pn/gi.exec(message.content);
         const playlistHasEnded = serverPlayer.playlistHasEnded();
         const playlistEntry = new PlaylistEntry(message, ytInfo);
 
