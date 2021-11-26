@@ -1,3 +1,4 @@
+// Comando para adicionar músicas na playlist p adiciona como última e pn como a próxima
 const radin = require('../player');
 const play  =  require('play-dl');
 const Command = require("../domain/Command");
@@ -8,6 +9,9 @@ const playSong = new Command(
         if (normalizedMessage.startsWith('p ')) {
             return [true, normalizedMessage.substring(2)];
         }
+        else if (normalizedMessage.startsWith('pn ')) {
+            return [true, normalizedMessage.substring(3)];
+        }
         return [false, ''];
     },
 
@@ -17,17 +21,23 @@ const playSong = new Command(
         if (!ytInfo) {
             return message.reply('Infelizmente sua pesquisa não foi encontrada ou não é um link de um vídeo no YouTube aa');
         }
-        
-        const playlist = serverPlayer.playlist;
+
+        const playNext = /^.+pn/gi.exec(message.content);
+        const playlistHasEnded = serverPlayer.playlistHasEnded();
         const playlistEntry = new PlaylistEntry(message, ytInfo);
 
-        playlist.push(playlistEntry);
+        if (playNext) {
+            serverPlayer.addToPlaylistNext(playlistEntry);
+        }
+        else {
+            serverPlayer.addToPlaylist(playlistEntry);
+        }
 
-        if (playlist.length - 1 === serverPlayer.currentSongIndex) {
+        if (playlistHasEnded) {
             radin(serverPlayer);
         }
         else {
-            message.reply('Sua música (' + ytInfo.title +  ') foi adicionada na queue e.e');
+            message.reply(`Sua música (${ytInfo.title}) foi adicionada ${playNext ? 'como a próxima' : ''} na queue e.e`);
         }
     }
 );
