@@ -1,13 +1,20 @@
 const play = require('play-dl');
 const { joinVoiceChannel, createAudioPlayer, createAudioResource, NoSubscriberBehavior, AudioPlayerStatus } = require('@discordjs/voice');
 
-module.exports = async function radin(serverPlayer) {
+module.exports = async function radin(serverPlayer, sendMessage=true) {
     const playlistEntry = serverPlayer.getCurrentEntry();
-    const audioPlayer = await playReq(playlistEntry, serverPlayer);
+    const audioPlayer = await playReq(playlistEntry, sendMessage);
 
     serverPlayer.currentAudioPlayer = audioPlayer;
 
+    const timeOutCheckPlaying = setTimeout(() => {
+        if (serverPlayer.notPlayingOrPaused()) {
+            serverPlayer.skipToSong(serverPlayer.currentSongIndex, false);
+        }
+    }, 5000);
+
     audioPlayer.on(AudioPlayerStatus.Idle, (oldState, newState) => {
+        clearTimeout(timeOutCheckPlaying);
         if (playlistEntry.stopRadin) {
             return;
         }
@@ -20,15 +27,9 @@ module.exports = async function radin(serverPlayer) {
 
         radin(serverPlayer);
     });
-
-    audioPlayer.on(AudioPlayerStatus.Buffering, (oldState, newState) => {
-        if (oldState.status === 'playing') {
-            console.log('Bugou?');
-        }
-    });
 }
 
-async function playReq(playlistEntry) {
+async function playReq(playlistEntry, sendMessage) {
     const message = playlistEntry.message;
 
     const connection = joinVoiceChannel({
@@ -46,7 +47,9 @@ async function playReq(playlistEntry) {
     const selectedSong = playlistEntry.ytInfo;
     const stream = await play.stream(selectedSong.url);
 
-    message.channel.send(`Está tocando: ${selectedSong.title} (${selectedSong.url})\nA pedido de: ${message.member.displayName}`);
+    if (sendMessage) {
+        message.channel.send(`Está tocando: ${selectedSong.title} (${selectedSong.url})\nA pedido de: ${message.member.displayName}`);
+    }
     
     let resource = createAudioResource(stream.stream, {
         inputType: stream.type

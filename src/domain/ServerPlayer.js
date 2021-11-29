@@ -24,7 +24,7 @@ class ServerPlayer {
         return this.currentSongIndex >= this.playlist.length;
     }
 
-    skipToSong(index = -1) {
+    skipToSong(index=-1, sendMessage=true) {
         if (index === -1) {
             index = this.currentSongIndex + 1;
         } else {
@@ -36,7 +36,7 @@ class ServerPlayer {
 
         this.currentSongIndex = index;
         if (!this.playlistHasEnded()) {
-            radin(this);
+            radin(this, sendMessage);
         }
     }
 
@@ -56,6 +56,14 @@ class ServerPlayer {
         const temp = this.playlist[from];
         this.playlist[from] = this.playlist[to];
         this.playlist[to] = temp;
+    }
+
+    playerStatus() {
+        return this.currentAudioPlayer?.state?.status;
+    }
+
+    notPlayingOrPaused() {
+        return this.playerStatus() != 'paused' && this.playerStatus() != 'playing';
     }
 }
 
