@@ -17,7 +17,7 @@ const queue = new Command(
 
         const nextSongs = serverPlayer.playlist.reduce((acc, playlistEntry, index) => {
             const ytInfo = playlistEntry.ytInfo;
-            return acc += `${index + 1} ${index === serverPlayer.currentSongIndex ? ' **-> Tocando atualmente :3**' : ''} - ${ytInfo.title}\n${ytInfo.url}\n`;
+            return acc += `${index + 1} - ${ytInfo.title} ${index === serverPlayer.currentSongIndex ? ' **-> Tocando atualmente :3**' : ''}\n${ytInfo.url}\n`;
         }, '');
 
         const playlistMessage = new MessageEmbed()

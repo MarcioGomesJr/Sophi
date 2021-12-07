@@ -15,6 +15,13 @@ module.exports = async function radin(serverPlayer, sendMessage=true) {
 
     audioPlayer.on(AudioPlayerStatus.Idle, (oldState, newState) => {
         clearTimeout(timeOutCheckPlaying);
+        setTimeout(() => {
+            const songCurrentIndex = serverPlayer.playlist.indexOf(playlistEntry);
+            if (songCurrentIndex !== -1) {
+                serverPlayer.removeFromPlaylist(songCurrentIndex);
+            }
+        }, 3600000); // One hour
+
         if (playlistEntry.stopRadin) {
             return;
         }

@@ -16,6 +16,17 @@ class ServerPlayer {
         return this.playlist.splice(this.currentSongIndex + 1, 0, playlistEntry);
     }
 
+    removeFromPlaylist(index) {
+        this.checkValidIndex(index);
+        const removed = this.playlist.splice(index, 1);
+
+        if (index <= this.currentSongIndex) {
+            this.currentSongIndex--;
+        }
+
+        return removed[0];
+    }
+
     getCurrentEntry() {
         return this.playlist[this.currentSongIndex];
     }
@@ -42,7 +53,7 @@ class ServerPlayer {
 
     checkValidIndex(index) {
         if (index < 0 || index >= this.playlist.length) {
-            throw new Error(`Índice ${index} inválido! Veja a playlist para saber quais podem ser usados :P`);
+            throw new Error(`Índice ${index + 1} inválido! Veja a playlist para saber quais podem ser usados :P`);
         }
     }
 

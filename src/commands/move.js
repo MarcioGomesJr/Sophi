@@ -10,10 +10,10 @@ const skip = new Command(
     },
 
     async (message, argument, serverPlayer) => {
-        const indexes = /[^\d]*(\d+) [^\d]*(\d+)/g.exec(argument);
+        const indexes = /^[^\d]*(\d+) [^\d]*(\d+)/g.exec(argument);
 
         if (!indexes) {
-            return message.reply('Uso errado do comando! Deve ser -mv 3 2 por exemplo');
+            return message.reply('Uso errado do comando! Deve ser -mv 3 2 por exemplo :v');
         }
 
         const from = new Number(indexes[1]) - 1;
