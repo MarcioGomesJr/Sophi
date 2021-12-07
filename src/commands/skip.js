@@ -8,9 +8,7 @@ const skip = new Command(
     },
 
     async (message, argument, serverPlayer) => {
-        const currentAudioPlayer = serverPlayer.currentAudioPlayer;
-
-        if (!currentAudioPlayer || serverPlayer.playlistHasEnded()) {
+        if (serverPlayer.playlistHasEnded()) {
             return message.channel.send('Não tem nada tocando ou pausado uwu');
         }
 

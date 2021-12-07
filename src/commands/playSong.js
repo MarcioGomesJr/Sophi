@@ -22,7 +22,7 @@ const playSong = new Command(
             return message.reply('Infelizmente sua pesquisa não foi encontrada ou não é um link de um vídeo no YouTube aa');
         }
 
-        const playNext = /^.+pn/gi.exec(message.content);
+        const playNext = /^\Spn/gi.exec(message.content);
         const playlistHasEnded = serverPlayer.playlistHasEnded();
         const playlistEntry = new PlaylistEntry(message, ytInfo);
 
