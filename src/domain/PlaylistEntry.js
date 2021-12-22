@@ -5,6 +5,10 @@ class PlaylistEntry {
         this.ytInfo = ytInfo;
         this.stopRadin = false;
     }
+
+    clone() {
+        return new PlaylistEntry(this.message, this.ytInfo);
+    }
 }
 
 module.exports = PlaylistEntry;

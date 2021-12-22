@@ -51,7 +51,11 @@ client.on('messageCreate', async message => {
 
         const serverPlayer = serverPlayers.get(message.guildId);
 
-        command.execute(message, argument, serverPlayer);
+        try {
+            command.execute(message, argument, serverPlayer);
+        } catch (e) {
+            console.log(`Erro ao processar a mensagem: "${normalizedMessage}":\n${e.message}`);
+        }
     });
 });
 

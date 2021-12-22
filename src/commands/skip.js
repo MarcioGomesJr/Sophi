@@ -1,4 +1,5 @@
 const Command = require("../domain/Command");
+
 const skip = new Command(
     (message, normalizedMessage) => {
         if (normalizedMessage === 's') {

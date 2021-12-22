@@ -20,7 +20,7 @@ module.exports = async function radin(serverPlayer, sendMessage=true) {
             if (songCurrentIndex !== -1) {
                 serverPlayer.removeFromPlaylist(songCurrentIndex);
             }
-        }, 3600000); // One hour
+        }, 10800000); // Three hours
 
         if (playlistEntry.stopRadin) {
             return;

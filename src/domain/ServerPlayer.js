@@ -22,6 +22,9 @@ class ServerPlayer {
 
         if (index <= this.currentSongIndex) {
             this.currentSongIndex--;
+            if (index === this.currentSongIndex + 1) {
+                this.skipToSong();
+            }
         }
 
         return removed[0];
@@ -37,6 +40,9 @@ class ServerPlayer {
 
     skipToSong(index=-1, sendMessage=true) {
         if (index === -1) {
+            if (this.playlistHasEnded()) {
+                return;
+            }
             index = this.currentSongIndex + 1;
         } else {
             this.checkValidIndex(index);
@@ -59,14 +65,31 @@ class ServerPlayer {
 
     move(from, to) {
         this.checkValidIndex(from);
-        this.checkValidIndex(to);
-        if (from == to) {
+        if (from === this.currentSongIndex) {
+            throw new Error(`Índice ${from + 1} inválido! Não se pode mover a música tocando agora :P`);
+        }
+        if (to < 0) {
+            throw new Error(`Índice ${to + 1} inválido! Deve ser maior ou igual a um :P`);
+        }
+        if (to === this.currentSongIndex) {
+            throw new Error(`Índice ${to + 1} inválido! Não se pode mover para a música tocando agora. Mova para next ou dê skip :P`);
+        }
+        if (to > this.playlist.length) {
+            throw new Error(`Índice ${to + 1} inválido! Deve ser maior menor que o último da playlist ou next :P`);
+        }
+        if (from === to) {
             throw new Error('Os índices são iguais aa');
         }
 
-        const temp = this.playlist[from];
-        this.playlist[from] = this.playlist[to];
-        this.playlist[to] = temp;
+        if (to === this.playlist.length) {
+            const playlistEntry = from === to - 1 ? this.playlist[from] : this.removeFromPlaylist(from);
+            this.addToPlaylistNext(playlistEntry.clone());
+        }
+        else {
+            const temp = this.playlist[from];
+            this.playlist[from] = this.playlist[to];
+            this.playlist[to] = temp;
+        }
     }
 
     playerStatus() {

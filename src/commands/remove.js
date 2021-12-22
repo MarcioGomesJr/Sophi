@@ -1,6 +1,6 @@
 // Comando para o bot remover uma música específica da playlist por index
 const Command = require("../domain/Command");
-const { MessageEmbed } = require('discord.js');
+const resolveIndex = require('../util/resolveIndex');
 
 const remove = new Command(
     (message, normalizedMessage) => {
@@ -11,13 +11,13 @@ const remove = new Command(
     },
 
     async (message, argument, serverPlayer) => {
-        const indexS = /^[^\d]*(\d+)/g.exec(argument);
-
-        if (!indexS) {
-            return message.reply('Uso errado do comando! Deve ser -r por exemplo :v');
+        const result = /^\s*(\d+|last|next)/g.exec(argument);
+        if (!result) {
+            return message.reply('Uso errado do comando! Deve ser -r 3 por exemplo :v');
         }
 
-        const index = Number(indexS[1]) - 1;
+        const index = resolveIndex(result[1], serverPlayer);
+        
         try {
             const removedEntry = serverPlayer.removeFromPlaylist(index);
 
