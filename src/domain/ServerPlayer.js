@@ -82,8 +82,8 @@ class ServerPlayer {
         }
 
         if (to === this.playlist.length) {
-            const playlistEntry = from === to - 1 ? this.playlist[from] : this.removeFromPlaylist(from);
-            this.addToPlaylistNext(playlistEntry.clone());
+            const playlistEntry = this.removeFromPlaylist(from);
+            this.addToPlaylist(playlistEntry.clone());
         }
         else {
             const temp = this.playlist[from];
@@ -98,6 +98,12 @@ class ServerPlayer {
 
     notPlayingOrPaused() {
         return this.playerStatus() != 'paused' && this.playerStatus() != 'playing';
+    }
+
+    clearPlaylist() {
+        this.getCurrentEntry().stopRadin = true;
+        this.playlist = [];
+        this.currentAudioPlayer.stop();
     }
 }
 
