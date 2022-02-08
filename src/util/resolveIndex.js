@@ -13,7 +13,7 @@ module.exports = (indexS, serverPlayer) => {
         return serverPlayer.currentSongIndex + 1;
     }
     if (indexS === 'last') {
-        return serverPlayer.playlist.length;
+        return serverPlayer.playlist.length - 1;
     }
     return Number(indexS) - 1;
 }
