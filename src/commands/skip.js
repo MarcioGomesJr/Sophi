@@ -1,11 +1,9 @@
 const Command = require("../domain/Command");
+const { messageIsCommand } = require('../util/commandUtil');
 
 const skip = new Command(
     (message, normalizedMessage) => {
-        if (normalizedMessage === 's') {
-            return [true, ''];
-        }
-        return [false, ''];
+        return messageIsCommand(normalizedMessage, ['skip', 's']);
     },
 
     async (message, argument, serverPlayer) => {

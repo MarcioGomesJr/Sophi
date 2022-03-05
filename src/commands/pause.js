@@ -1,11 +1,9 @@
 const Command = require("../domain/Command");
+const { messageIsCommand } = require('../util/commandUtil');
 
 const pause = new Command(
     (message, normalizedMessage) => {
-        if (normalizedMessage === 'p') {
-            return [true, ''];
-        }
-        return [false, ''];
+        return messageIsCommand(normalizedMessage, ['pause', 'play', 'p']);
     },
 
     async (message, argument, serverPlayer) => {

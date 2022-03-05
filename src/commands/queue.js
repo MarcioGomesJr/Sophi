@@ -1,12 +1,10 @@
 const Command = require("../domain/Command");
 const { MessageEmbed } = require('discord.js');
+const { messageIsCommand } = require('../util/commandUtil');
 
 const queue = new Command(
     (message, normalizedMessage) => {
-        if (normalizedMessage === 'q') {
-            return [true, ''];
-        }
-        return [false, ''];
+        return messageIsCommand(normalizedMessage, ['queue', 'q']);
     },
 
     async (message, argument, serverPlayer) => {

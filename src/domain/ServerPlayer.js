@@ -101,9 +101,16 @@ class ServerPlayer {
     }
 
     clearPlaylist() {
-        this.getCurrentEntry().stopRadin = true;
+        if (this.playlist.length === 0) {
+            return;
+        }
+        if (this.getCurrentEntry) {
+            this.getCurrentEntry().stopRadin = true;
+        }
         this.playlist = [];
-        this.currentAudioPlayer.stop();
+        if (this.currentAudioPlayer) {
+            this.currentAudioPlayer.stop();
+        }
     }
 }
 
