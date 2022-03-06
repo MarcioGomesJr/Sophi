@@ -1,11 +1,18 @@
 const radin = require('../player');
+const { createAudioPlayer, NoSubscriberBehavior } = require('@discordjs/voice');
 
 class ServerPlayer {
 
     constructor() {
         this.playlist = [];
-        this.currentAudioPlayer = null;
         this.currentSongIndex = 0;
+        this.idleTimer = null;
+        this.voiceConnection = null;
+        this.audioPlayer = createAudioPlayer({
+            behaviors:{
+                noSubscriber: NoSubscriberBehavior.Play,
+            }
+        });
     }
 
     addToPlaylist(playlistEntry) {
@@ -49,7 +56,7 @@ class ServerPlayer {
         }
 
         this.getCurrentEntry().stopRadin = true;
-        this.currentAudioPlayer.stop();
+        this.audioPlayer.stop();
 
         this.currentSongIndex = index;
         if (!this.playlistHasEnded()) {
@@ -93,7 +100,7 @@ class ServerPlayer {
     }
 
     playerStatus() {
-        return this.currentAudioPlayer?.state?.status;
+        return this.audioPlayer.state.status;
     }
 
     notPlayingOrPaused() {
@@ -101,9 +108,14 @@ class ServerPlayer {
     }
 
     clearPlaylist() {
-        this.getCurrentEntry().stopRadin = true;
+        if (this.playlist.length === 0) {
+            return;
+        }
+        if (this.getCurrentEntry()) {
+            this.getCurrentEntry().stopRadin = true;
+        }
         this.playlist = [];
-        this.currentAudioPlayer.stop();
+        this.audioPlayer.stop();
     }
 }
 

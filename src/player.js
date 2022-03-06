@@ -1,11 +1,11 @@
 const play = require('play-dl');
-const { joinVoiceChannel, createAudioPlayer, createAudioResource, NoSubscriberBehavior, AudioPlayerStatus } = require('@discordjs/voice');
+const { joinVoiceChannel, createAudioResource, AudioPlayerStatus, VoiceConnectionStatus } = require('@discordjs/voice');
 
 module.exports = async function radin(serverPlayer, sendMessage=true) {
     const playlistEntry = serverPlayer.getCurrentEntry();
-    const audioPlayer = await playReq(playlistEntry, sendMessage);
+    await playReq(serverPlayer, playlistEntry, sendMessage);
 
-    serverPlayer.currentAudioPlayer = audioPlayer;
+    clearTimeout(serverPlayer.idleTimer);
 
     const timeOutCheckPlaying = setTimeout(() => {
         if (serverPlayer.notPlayingOrPaused()) {
@@ -13,8 +13,12 @@ module.exports = async function radin(serverPlayer, sendMessage=true) {
         }
     }, 5000);
 
-    audioPlayer.on(AudioPlayerStatus.Idle, (oldState, newState) => {
+    serverPlayer.audioPlayer.once(AudioPlayerStatus.Idle, (oldState, newState) => {
         clearTimeout(timeOutCheckPlaying);
+        serverPlayer.idleTimer = setTimeout(() => {
+            serverPlayer.voiceConnection.disconnect();
+        }, 15 * 60000);
+
         setTimeout(() => {
             const songCurrentIndex = serverPlayer.playlist.indexOf(playlistEntry);
             if (songCurrentIndex !== -1) {
@@ -36,20 +40,23 @@ module.exports = async function radin(serverPlayer, sendMessage=true) {
     });
 }
 
-async function playReq(playlistEntry, sendMessage) {
+async function playReq(serverPlayer, playlistEntry, sendMessage) {
     const message = playlistEntry.message;
-
-    const connection = joinVoiceChannel({
+    const joinOptions = {
         channelId : message.member.voice.channel.id,
         guildId : message.guild.id,
         adapterCreator: message.guild.voiceAdapterCreator,
-    });
+    }
 
-    const audioPlayer = createAudioPlayer({
-        behaviors:{
-            noSubscriber: NoSubscriberBehavior.Play,
-        }
-    });
+    if (!serverPlayer.voiceConnection || joinOptions.channelId !== serverPlayer.voiceConnection.joinConfig.channelId) {
+        serverPlayer.voiceConnection = joinVoiceChannel(joinOptions);
+    }
+    else if (serverPlayer.voiceConnection.state.status === VoiceConnectionStatus.Disconnected) {
+        serverPlayer.voiceConnection.rejoin(joinOptions);
+    }
+
+    const connection = serverPlayer.voiceConnection;
+    const audioPlayer = serverPlayer.audioPlayer;
 
     const selectedSong = playlistEntry.ytInfo;
     const stream = await play.stream(selectedSong.url);
@@ -64,6 +71,4 @@ async function playReq(playlistEntry, sendMessage) {
     
     audioPlayer.play(resource);
     connection.subscribe(audioPlayer);
-
-    return audioPlayer;
 }

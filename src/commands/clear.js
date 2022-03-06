@@ -1,12 +1,10 @@
 // Comando para limpar a playlist
 const Command = require("../domain/Command");
+const { messageIsCommand } = require('../util/commandUtil');
 
 const skip = new Command(
     (message, normalizedMessage) => {
-        if (normalizedMessage === 'clear') {
-            return [true, ''];
-        }
-        return [false, ''];
+        return messageIsCommand(normalizedMessage, ['clear', 'c']);
     },
 
     async (message, argument, serverPlayer) => {

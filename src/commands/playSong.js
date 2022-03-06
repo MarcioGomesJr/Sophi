@@ -1,18 +1,17 @@
 // Comando para adicionar músicas na playlist p adiciona como última e pn como a próxima
 const radin = require('../player');
-const play  =  require('play-dl');
+const play = require('play-dl');
 const Command = require("../domain/Command");
 const PlaylistEntry = require('../domain/PlaylistEntry');
+const { messageStartsWithCommand } = require('../util/commandUtil');
 
 const playSong = new Command(
     (message, normalizedMessage) => {
-        if (normalizedMessage.startsWith('p ')) {
-            return [true, normalizedMessage.substring(2)];
+        const isNormalPlay = messageStartsWithCommand(normalizedMessage, ['play', 'p']);
+        if (isNormalPlay[0]) {
+            return isNormalPlay;
         }
-        else if (normalizedMessage.startsWith('pn ')) {
-            return [true, normalizedMessage.substring(3)];
-        }
-        return [false, ''];
+        return messageStartsWithCommand(normalizedMessage, ['playnext', 'pn']);
     },
 
     async (message, argument, serverPlayer) => {

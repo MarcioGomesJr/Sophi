@@ -1,24 +1,22 @@
 const Command = require("../domain/Command");
+const { messageIsCommand } = require('../util/commandUtil');
 
 const pause = new Command(
     (message, normalizedMessage) => {
-        if (normalizedMessage === 'p') {
-            return [true, ''];
-        }
-        return [false, ''];
+        return messageIsCommand(normalizedMessage, ['pause', 'play', 'p']);
     },
 
     async (message, argument, serverPlayer) => {
-        const currentAudioPlayer = serverPlayer.currentAudioPlayer;
+        const audioPlayer = serverPlayer.audioPlayer;
         if (serverPlayer.notPlayingOrPaused()) {
             message.channel.send('Não tem nada tocando ou pausado owo');
         }
         else if (serverPlayer.playerStatus() === 'paused') {
-            currentAudioPlayer.unpause();
+            audioPlayer.unpause();
             message.channel.send("It's dare U-U");
         }
         else if (serverPlayer.playerStatus() === 'playing') {
-            currentAudioPlayer.pause();
+            audioPlayer.pause();
             message.channel.send("PAUSO! O-o");
         }
     }

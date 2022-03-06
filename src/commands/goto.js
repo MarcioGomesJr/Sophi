@@ -1,12 +1,10 @@
 // Comando para pular para um index da playlist
 const Command = require("../domain/Command");
+const { messageStartsWithCommand } = require('../util/commandUtil');
 
 const skip = new Command(
     (message, normalizedMessage) => {
-        if (normalizedMessage.startsWith('goto')) {
-            return [true, normalizedMessage.substring(5)];
-        }
-        return [false, ''];
+        return messageStartsWithCommand(normalizedMessage, ['goto', 'go']);
     },
 
     async (message, argument, serverPlayer) => {

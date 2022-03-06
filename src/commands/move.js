@@ -1,13 +1,11 @@
 // Comando para manipular a playlist movendo elementos dela pelos indexes
 const Command = require("../domain/Command");
 const resolveIndex = require('../util/resolveIndex');
+const { messageStartsWithCommand } = require('../util/commandUtil');
 
 const skip = new Command(
     (message, normalizedMessage) => {
-        if (normalizedMessage.startsWith('mv ')) {
-            return [true, normalizedMessage.substring(3)];
-        }
-        return [false, ''];
+        return messageStartsWithCommand(normalizedMessage, ['move', 'mv']);
     },
 
     async (message, argument, serverPlayer) => {
