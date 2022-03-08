@@ -9,7 +9,7 @@ class ServerPlayer {
         this.idleTimer = null;
         this.voiceConnection = null;
         this.audioPlayer = createAudioPlayer({
-            behaviors:{
+            behaviors: {
                 noSubscriber: NoSubscriberBehavior.Play,
             }
         });

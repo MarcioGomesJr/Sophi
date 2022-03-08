@@ -15,7 +15,7 @@ const playSong = new Command(
     },
 
     async (message, argument, serverPlayer) => {
-        const ytInfo = (await play.search(argument, { limit : 1 }))[0];
+        const ytInfo = (await play.search(encodeURIComponent(argument), { limit : 1 }))[0];
 
         if (!ytInfo) {
             return message.reply('Infelizmente sua pesquisa não foi encontrada ou não é um link de um vídeo no YouTube aa');

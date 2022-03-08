@@ -11,13 +11,13 @@ module.exports = async function radin(serverPlayer, sendMessage=true) {
         if (serverPlayer.notPlayingOrPaused()) {
             serverPlayer.skipToSong(serverPlayer.currentSongIndex, false);
         }
-    }, 5000);
+    }, 6000); // 5 seconds
 
     serverPlayer.audioPlayer.once(AudioPlayerStatus.Idle, (oldState, newState) => {
         clearTimeout(timeOutCheckPlaying);
         serverPlayer.idleTimer = setTimeout(() => {
             serverPlayer.voiceConnection.disconnect();
-        }, 15 * 60000);
+        }, 900000); // 15 minutes
 
         setTimeout(() => {
             const songCurrentIndex = serverPlayer.playlist.indexOf(playlistEntry);
@@ -42,8 +42,14 @@ module.exports = async function radin(serverPlayer, sendMessage=true) {
 
 async function playReq(serverPlayer, playlistEntry, sendMessage) {
     const message = playlistEntry.message;
+    
+    let channelId = message.member.voice?.channel?.id;
+    if (!channelId) {
+        channelId = playlistEntry.originalVoiceChannelId;
+    }
+
     const joinOptions = {
-        channelId : message.member.voice.channel.id,
+        channelId,
         guildId : message.guild.id,
         adapterCreator: message.guild.voiceAdapterCreator,
     }
@@ -57,7 +63,6 @@ async function playReq(serverPlayer, playlistEntry, sendMessage) {
 
     const connection = serverPlayer.voiceConnection;
     const audioPlayer = serverPlayer.audioPlayer;
-
     const selectedSong = playlistEntry.ytInfo;
     const stream = await play.stream(selectedSong.url);
 
