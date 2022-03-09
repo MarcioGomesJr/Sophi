@@ -9,7 +9,7 @@ const skip = new Command(
     },
 
     async (message, argument, serverPlayer) => {
-        const indexes = /^\s*(\d+|last|next) \s*(\d+|last|next)/g.exec(argument);
+        const indexes = /^(\d+|last|next) \s*(\d+|last|next)$/g.exec(argument);
 
         if (!indexes) {
             return message.reply('Uso errado do comando! Deve ser -mv 3 2 por exemplo :v');
@@ -18,12 +18,7 @@ const skip = new Command(
         const from = resolveIndex(indexes[1], serverPlayer);
         const to = resolveIndex(indexes[2], serverPlayer);
 
-        try {
-            serverPlayer.move(from, to);
-        } catch (e) {
-            return message.reply(e.message);
-        }
-
+        serverPlayer.move(from, to);
         message.channel.send('Músicas movidas uwu');
     }
 );

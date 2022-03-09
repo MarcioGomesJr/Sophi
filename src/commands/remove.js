@@ -9,20 +9,15 @@ const remove = new Command(
     },
 
     async (message, argument, serverPlayer) => {
-        const result = /^\s*(\d+|last|next)/g.exec(argument);
+        const result = /^(\d+|last|next)$/g.exec(argument);
         if (!result) {
             return message.reply('Uso errado do comando! Deve ser -r 3 por exemplo :v');
         }
 
         const index = resolveIndex(result[1], serverPlayer);
-        
-        try {
-            const removedEntry = serverPlayer.removeFromPlaylist(index);
+        const removedEntry = serverPlayer.removeFromPlaylist(index);
 
-            message.channel.send(`Música ${removedEntry.ytInfo.title} removida OwO`);
-        } catch (e) {
-            return message.reply(e.message);
-        }
+        message.channel.send(`Música ${removedEntry.ytInfo.title} removida OwO`);
     }
 );
 

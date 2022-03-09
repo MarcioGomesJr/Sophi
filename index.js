@@ -1,7 +1,8 @@
 const { getClient } = require('./src/util/singletonManager');
 const ServerPlayer = require('./src/domain/ServerPlayer');
-const token  = require('./src/token').token;
+const SophiError = require('./src/domain/SophiError');
 
+const token = require('./src/token').token;
 const allCommands = require('./src/commands/allCommands');
 
 const sophi = getClient();
@@ -40,11 +41,14 @@ sophi.on('messageCreate', async message => {
 
         const serverPlayer = serverPlayers.get(message.guildId);
 
-        try {
-            command.execute(message, argument, serverPlayer);
-        } catch (e) {
-            console.log(`Erro ao processar a mensagem: "${normalizedMessage}":\n${e.message}`);
-        }
+        command.execute(message, argument, serverPlayer).catch(e => {
+            if (e instanceof SophiError) {
+                message.reply(e.message);
+            }
+            else {
+                console.log(`Erro ao processar a mensagem: "${normalizedMessage}": ${e.message}`);
+            }
+        });
     });
 });
 

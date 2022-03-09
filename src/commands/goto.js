@@ -8,18 +8,14 @@ const skip = new Command(
     },
 
     async (message, argument, serverPlayer) => {
-        const result = /^\s*(\d+|last|next)/g.exec(argument);
+        const result = /^(\d+|last|next)$/g.exec(argument);
         if (!result) {
             return message.reply('Uso errado do comando! Deve ser -goto 3 por exemplo :v');
         }
 
         const index = resolveIndex(result[1], serverPlayer);
 
-        try {
-            serverPlayer.skipToSong(index);
-        } catch (e) {
-            return message.reply(e.message);
-        }
+        serverPlayer.skipToSong(index);
     }
 );
 

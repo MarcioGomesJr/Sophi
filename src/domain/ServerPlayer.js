@@ -1,5 +1,6 @@
 const radin = require('../player');
 const { createAudioPlayer, NoSubscriberBehavior } = require('@discordjs/voice');
+const SophiError = require('../domain/SophiError');
 
 class ServerPlayer {
 
@@ -66,26 +67,26 @@ class ServerPlayer {
 
     checkValidIndex(index) {
         if (index < 0 || index >= this.playlist.length) {
-            throw new Error(`Índice ${index + 1} inválido! Veja a playlist para saber quais podem ser usados :P`);
+            throw new SophiError(`Índice ${index + 1} inválido! Veja a playlist para saber quais podem ser usados :P`);
         }
     }
 
     move(from, to) {
         this.checkValidIndex(from);
         if (from === this.currentSongIndex) {
-            throw new Error(`Índice ${from + 1} inválido! Não se pode mover a música tocando agora :P`);
+            throw new SophiError(`Índice ${from + 1} inválido! Não se pode mover a música tocando agora :P`);
         }
         if (to < 0) {
-            throw new Error(`Índice ${to + 1} inválido! Deve ser maior ou igual a um :P`);
+            throw new SophiError(`Índice ${to + 1} inválido! Deve ser maior ou igual a um :P`);
         }
         if (to === this.currentSongIndex) {
-            throw new Error(`Índice ${to + 1} inválido! Não se pode mover para a música tocando agora. Mova para next ou dê skip :P`);
+            throw new SophiError(`Índice ${to + 1} inválido! Não se pode mover para a música tocando agora. Mova para next ou dê skip :P`);
         }
         if (to > this.playlist.length) {
-            throw new Error(`Índice ${to + 1} inválido! Deve ser maior menor que o último da playlist ou next :P`);
+            throw new SophiError(`Índice ${to + 1} inválido! Deve ser maior menor que o último da playlist ou next :P`);
         }
         if (from === to) {
-            throw new Error('Os índices são iguais aa');
+            throw new SophiError('Os índices são iguais aa');
         }
 
         if (to === this.playlist.length) {
