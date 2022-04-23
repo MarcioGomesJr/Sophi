@@ -16,12 +16,11 @@ class ServerPlayer {
         });
     }
 
-    addToPlaylist(playlistEntry) {
+    addToPlaylist(playlistEntry, asNext = false) {
+        if (asNext) {
+            return this.playlist.splice(this.currentSongIndex + 1, 0, playlistEntry);
+        }
         return this.playlist.push(playlistEntry);
-    }
-
-    addToPlaylistNext(playlistEntry) {
-        return this.playlist.splice(this.currentSongIndex + 1, 0, playlistEntry);
     }
 
     removeFromPlaylist(index) {
