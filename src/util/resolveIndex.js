@@ -15,5 +15,11 @@ module.exports = (indexS, serverPlayer) => {
     if (indexS === 'last') {
         return serverPlayer.playlist.length - 1;
     }
-    return Number(indexS) - 1;
+    
+    const index = Number(indexS);
+    if (index < 0) {
+        return serverPlayer.playlist.length - 1 - index;
+    }
+
+    return index - 1;
 }

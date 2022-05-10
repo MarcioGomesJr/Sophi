@@ -4,6 +4,7 @@ const { joinVoiceChannel, createAudioResource, AudioPlayerStatus, VoiceConnectio
 module.exports = async function radin(serverPlayer, sendMessage=true) {
     const playlistEntry = serverPlayer.getCurrentEntry();
     const sucesso = await playReq(serverPlayer, playlistEntry, sendMessage);
+    clearTimeout(serverPlayer.idleTimer);
 
     if (!sucesso) {
         serverPlayer.currentSongIndex++;
@@ -15,8 +16,6 @@ module.exports = async function radin(serverPlayer, sendMessage=true) {
         radin(serverPlayer);
         return;
     }
-
-    clearTimeout(serverPlayer.idleTimer);
 
     const timeOutCheckPlaying = setTimeout(() => {
         if (serverPlayer.notPlayingOrPaused()) {
@@ -91,7 +90,7 @@ async function playReq(serverPlayer, playlistEntry, sendMessage) {
         return true;
     } catch(e) {
         console.log(`Erro ao reproduzir música "${selectedSong.title}": ${e}`);
-        message.channel.send(`Não foi possível reproduzir o vídeo ${selectedSong.title}\nProvavelmente tem restrição de idade ou está privado @w@`);
+        message.channel.send(`Não foi possível reproduzir a música (${selectedSong.title})\nProvavelmente tem restrição de idade ou está privado @w@`);
         
         return false;
     }
