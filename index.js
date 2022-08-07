@@ -23,7 +23,7 @@ sophi.on('messageCreate', async message => {
         return message.channel.send('Sinto muito, só funciono em servidores! ewe');
     }
 
-    const normalizedMessage = message.content.substring(1).toLowerCase();
+    const normalizedMessage = normalizeMessage(message.content);
 
     allCommands.forEach((command) => {
         const [willExecute, argument] = command.shouldExecute(message, normalizedMessage);
@@ -46,10 +46,23 @@ sophi.on('messageCreate', async message => {
                 message.reply(e.message);
             }
             else {
-                console.log(`Erro ao processar a mensagem: "${normalizedMessage}": ${e.message}`);
+                console.log(`Erro ao processar a mensagem: "${normalizedMessage}": ${e}`);
             }
         });
     });
 });
+
+function normalizeMessage(messageText) {
+    const textWithoutPrefix = messageText.substring(1);
+    const separator = /^(\S+)(\s+)?(.+)?$/g;
+
+    const match = separator.exec(textWithoutPrefix);
+
+    if (match[3] === undefined) {
+        return match[1].toLowerCase();
+    }
+
+    return match[1].toLowerCase() + ' ' + match[3];
+}
 
 sophi.login(token);

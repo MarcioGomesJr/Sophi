@@ -6,18 +6,28 @@ const PlaylistEntry = require('../domain/PlaylistEntry');
 const { messageStartsWithCommand } = require('../util/commandUtil');
 const resolveIndex = require('../util/resolveIndex');
 
-// TODO tratar erro ao tentar tocar música com restrição de idade aqui para simplificar um pouco o player,
-// implementar tocar playlists do youtube, limitar durtação dos vídeos e no futuro implementar busca em
-// outros serviços de vídeos/áudio.
+// TODO Implementar tocar playlists do youtube, limitar durtação dos vídeos, implementar pesquisa
+// e no futuro implementar busca em outros serviços de vídeos/áudio.
 async function searchYoutube(searchTerm) {
-    if (searchTerm.startsWith('https') && playdl.yt_validate(searchTerm) !== 'video') {
-        return [null, 'Infelizmente só consigo reproduzir links de vídeos do YouTube a'];
+    let fuzzy = true;
+
+    if (searchTerm.startsWith('https')) {
+        searchTerm = searchTerm.replace(/&.+$/ig, '');
+        fuzzy = false;
+
+        if (playdl.yt_validate(searchTerm) !== 'video') {
+            return [null, 'Infelizmente só consigo reproduzir links de vídeos do YouTube a'];
+        }
     }
 
-    const [ytInfo] = await playdl.search(encodeURIComponent(searchTerm), { source: { youtube: 'video' }, limit : 1 });
+    const [ytInfo] = await playdl.search(searchTerm, { source: { youtube: 'video' }, limit : 1, fuzzy });
 
     if (!ytInfo) {
         return [null, 'Infelizmente sua pesquisa não foi encontrada ou não é um link de um vídeo no YouTube aa'];
+    }
+
+    if (ytInfo.discretionAdvised) {
+        return [null, `Não foi possível reproduzir a música (${ytInfo.title})\nPois ela tem restrição de idade @w@`];
     }
 
     return [ytInfo, null];
