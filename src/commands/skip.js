@@ -3,7 +3,7 @@ const { messageIsCommand } = require('../util/commandUtil');
 
 const skip = new Command(
     (message, normalizedMessage) => {
-        return messageIsCommand(normalizedMessage, ['skip', 's']);
+        return messageIsCommand(normalizedMessage, ['skip', 'next', 's', 'n']);
     },
 
     async (message, argument, serverPlayer) => {

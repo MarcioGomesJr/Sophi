@@ -1,30 +1,24 @@
 const play = require('play-dl');
 const { joinVoiceChannel, createAudioResource, AudioPlayerStatus, VoiceConnectionStatus } = require('@discordjs/voice');
 
-module.exports = async function radin(serverPlayer, sendMessage=true) {
+async function radin(serverPlayer, sendMessage=true) {
     const playlistEntry = serverPlayer.getCurrentEntry();
     const sucesso = await playReq(serverPlayer, playlistEntry, sendMessage);
     clearTimeout(serverPlayer.idleTimer);
 
     if (!sucesso) {
-        serverPlayer.currentSongIndex++;
-
-        if (serverPlayer.playlistHasEnded()) {
-            return;
-        }
-
-        radin(serverPlayer);
+        goToNextSong(serverPlayer);
         return;
     }
 
-    const timeOutCheckPlaying = setTimeout(() => {
+    const timeOutCheckPlaying = setInterval(() => {
         if (serverPlayer.notPlayingOrPaused()) {
             serverPlayer.skipToSong(serverPlayer.currentSongIndex, false);
         }
     }, 5000); // 5 seconds
 
     serverPlayer.audioPlayer.once(AudioPlayerStatus.Idle, (oldState, newState) => {
-        clearTimeout(timeOutCheckPlaying);
+        clearInterval(timeOutCheckPlaying);
         serverPlayer.idleTimer = setTimeout(() => {
             serverPlayer.voiceConnection.disconnect();
         }, 900000); // 15 minutes
@@ -40,14 +34,18 @@ module.exports = async function radin(serverPlayer, sendMessage=true) {
             return;
         }
 
-        serverPlayer.currentSongIndex++;
-
-        if (serverPlayer.playlistHasEnded()) {
-            return;
-        }
-
-        radin(serverPlayer);
+        goToNextSong(serverPlayer);
     });
+}
+
+function goToNextSong(serverPlayer) {
+    serverPlayer.currentSongIndex++;
+
+    if (serverPlayer.playlistHasEnded()) {
+        return;
+    }
+
+    radin(serverPlayer);
 }
 
 async function playReq(serverPlayer, playlistEntry, sendMessage) {
@@ -95,3 +93,5 @@ async function playReq(serverPlayer, playlistEntry, sendMessage) {
         return false;
     }
 }
+
+module.exports = radin;
