@@ -6,17 +6,28 @@ const PlaylistEntry = require('../domain/PlaylistEntry');
 const { messageStartsWithCommand } = require('../util/commandUtil');
 const resolveIndex = require('../util/resolveIndex');
 
-// TODO Implementar tocar playlists do youtube, limitar durtação dos vídeos, implementar pesquisa
-// e no futuro implementar busca em outros serviços de vídeos/áudio.
+// TODO Implementar limitação da durtação dos vídeos, pesquisa
+// e no futuro busca em outros serviços de vídeos/áudio.
 async function searchYoutube(searchTerm) {
     let fuzzy = true;
 
     if (searchTerm.startsWith('https')) {
+        // É um link mas não é do youtube. Por enquanto descartamos
+        if (playdl.yt_validate(searchTerm) === false) {
+            return [null, 'Infelizmente só consigo reproduzir links do YouTube a'];
+        }
+
+        // Supostamente é uma playlist do youtube. Validamos desse jeito pois se o vídeo faz parte de uma playlist
+        // o play-dl.yt_validate identifica como uma playlist, e não queremos isso.
+        if (searchTerm.includes('/playlist?list')) {
+            return searchYoutubePlaylist(searchTerm);
+        }
+
         searchTerm = searchTerm.replace(/&.+$/ig, '');
         fuzzy = false;
 
         if (playdl.yt_validate(searchTerm) !== 'video') {
-            return [null, 'Infelizmente só consigo reproduzir links de vídeos do YouTube a'];
+            return [null, 'Infelizmente só consigo reproduzir links de vídeos ou playlists do YouTube a'];
         }
     }
 
@@ -30,21 +41,48 @@ async function searchYoutube(searchTerm) {
         return [null, `Não foi possível reproduzir a música (${ytInfo.title})\nPois ela tem restrição de idade @w@`];
     }
 
-    return [ytInfo, null];
+    return [[ytInfo], null];
 }
 
-function playOrAddToPlaylist(message, serverPlayer, ytInfo, asNext = false) {
+async function searchYoutubePlaylist(searchTerm) {
+    if (playdl.yt_validate(searchTerm) !== 'playlist') {
+        return [null, 'Infelizmente só consigo reproduzir links de vídeos ou playlists do YouTube a'];
+    }
+
+    let videos = null;
+
+    try {
+        const playlistInfo = await playdl.playlist_info(searchTerm);
+        await playlistInfo.fetch();
+        videos = await playlistInfo.page(1);
+    } catch {}
+
+    if (!videos) {
+        return [null, 'Infelizmente ocorreu um erro ao ler os vídeos dessa playlist do YouTube aa'];
+    }
+
+    return [videos, null];
+}
+
+function playOrAddToPlaylist(message, serverPlayer, ytInfos, asNext = false) {
     const playlistHasEnded = serverPlayer.playlistHasEnded();
-    const playlistEntry = new PlaylistEntry(message, ytInfo);
 
-    serverPlayer.addToPlaylist(playlistEntry, asNext);
+    if (ytInfos.length > 1) {
+        message.reply(`Um total de (${ytInfos.length}) músicas foram adicionadas ${asNext ? 'como as próximas' : ''} na queue e.e`);
+    }
+    else if (playlistHasEnded) {
+        message.reply(`Sua música (${ytInfos[0].title}) foi adicionada ${asNext ? 'como a próxima' : ''} na queue e.e`);
+    }
 
-    if (playlistHasEnded) {
-        radin(serverPlayer);
-    }
-    else {
-        message.reply(`Sua música (${ytInfo.title}) foi adicionada ${asNext ? 'como a próxima' : ''} na queue e.e`);
-    }
+    ytInfos.forEach((ytInfo, index) => {
+        const playlistEntry = new PlaylistEntry(message, ytInfo);
+
+        serverPlayer.addToPlaylist(playlistEntry, asNext);
+
+        if (playlistHasEnded && index == 0) {
+            radin(serverPlayer);
+        }
+    });
 }
 
 const play = new Command(
@@ -53,13 +91,13 @@ const play = new Command(
     },
 
     async (message, argument, serverPlayer) => {
-        const [ytInfo, error] = await searchYoutube(argument);
+        const [ytInfos, error] = await searchYoutube(argument);
 
         if (error) {
             return message.reply(error);
         }
 
-        playOrAddToPlaylist(message, serverPlayer, ytInfo);
+        playOrAddToPlaylist(message, serverPlayer, ytInfos);
     }
 );
 
@@ -69,13 +107,13 @@ const playNext = new Command(
     },
 
     async (message, argument, serverPlayer) => {
-        const [ytInfo, error] = await searchYoutube(argument);
+        const [ytInfos, error] = await searchYoutube(argument);
 
         if (error) {
             return message.reply(error);
         }
 
-        playOrAddToPlaylist(message, serverPlayer, ytInfo, true);
+        playOrAddToPlaylist(message, serverPlayer, ytInfos, true);
     }
 );
 
