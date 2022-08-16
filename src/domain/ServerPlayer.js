@@ -66,7 +66,7 @@ class ServerPlayer {
 
     checkValidIndex(index) {
         if (index < 0 || index >= this.playlist.length) {
-            throw new SophiError(`Índice ${index + 1} inválido! Veja a playlist para saber quais podem ser usados :P`);
+            throw new SophiError(`Índice ${index + 1} inválido! Veja a playlist com -q para saber quais podem ser usados :P`);
         }
     }
 

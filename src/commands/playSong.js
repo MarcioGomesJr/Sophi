@@ -129,11 +129,8 @@ const playAgain = new Command(
         }
 
         const index = resolveIndex(result[1], serverPlayer);
+        serverPlayer.checkValidIndex(index);
         const playlistEntry = serverPlayer.playlist[index];
-
-        if (!playlistEntry) {
-            return message.reply('Esse índice não é uma música válida! Use o -q para ver a playlist :v');
-        }
 
         playOrAddToPlaylist(message, serverPlayer, playlistEntry.ytInfo);
     }
