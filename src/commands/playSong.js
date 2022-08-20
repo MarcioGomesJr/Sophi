@@ -70,7 +70,7 @@ function playOrAddToPlaylist(message, serverPlayer, ytInfos, asNext = false) {
     if (ytInfos.length > 1) {
         message.reply(`Um total de (${ytInfos.length}) músicas foram adicionadas ${asNext ? 'como as próximas' : ''} na queue e.e`);
     }
-    else if (playlistHasEnded) {
+    else if (!playlistHasEnded) {
         message.reply(`Sua música (${ytInfos[0].title}) foi adicionada ${asNext ? 'como a próxima' : ''} na queue e.e`);
     }
 
@@ -132,7 +132,7 @@ const playAgain = new Command(
         serverPlayer.checkValidIndex(index);
         const playlistEntry = serverPlayer.playlist[index];
 
-        playOrAddToPlaylist(message, serverPlayer, playlistEntry.ytInfo);
+        playOrAddToPlaylist(message, serverPlayer, [playlistEntry.ytInfo]);
     }
 );
 

@@ -46,7 +46,7 @@ sophi.on('messageCreate', async message => {
                 message.reply(e.message);
             }
             else {
-                console.log(`Erro ao processar a mensagem: "${normalizedMessage}": ${e}`);
+                console.log(`Erro ao processar a mensagem: "${normalizedMessage}": ${e}\n${e.stack}`);
             }
         });
     });
