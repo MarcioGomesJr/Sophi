@@ -79,10 +79,10 @@ class ServerPlayer {
             throw new SophiError(`Índice ${to + 1} inválido! Deve ser maior ou igual a um :P`);
         }
         if (to === this.currentSongIndex) {
-            throw new SophiError(`Índice ${to + 1} inválido! Não se pode mover para a música tocando agora. Mova para next ou dê skip :P`);
+            throw new SophiError(`Índice ${to + 1} inválido! Não se pode mover para a música tocando agora. Mova para next e dê skip :P`);
         }
         if (to > this.playlist.length) {
-            throw new SophiError(`Índice ${to + 1} inválido! Deve ser maior menor que o último da playlist ou next :P`);
+            throw new SophiError(`Índice ${to + 1} inválido! Deve ser menor que um após o último da playlist :P`);
         }
         if (from === to) {
             throw new SophiError('Os índices são iguais aa');

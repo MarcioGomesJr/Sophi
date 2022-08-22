@@ -1,6 +1,7 @@
 // Comando para pular para um index da playlist
 const Command = require("../domain/Command");
 const { messageStartsWithCommand } = require('../util/commandUtil');
+const { resolveIndex, getIndexRegex } = require("../util/indexUtil");
 
 const skip = new Command(
     (message, normalizedMessage) => {
@@ -8,7 +9,7 @@ const skip = new Command(
     },
 
     async (message, argument, serverPlayer) => {
-        const result = /^(\d+|last|next)$/g.exec(argument);
+        const result = getIndexRegex().exec(argument);
         if (!result) {
             return message.reply('Uso errado do comando! Deve ser -goto 3 por exemplo :v');
         }

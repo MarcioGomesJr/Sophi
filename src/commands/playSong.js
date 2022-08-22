@@ -4,7 +4,7 @@ const radin = require('../player');
 const Command = require("../domain/Command");
 const PlaylistEntry = require('../domain/PlaylistEntry');
 const { messageStartsWithCommand } = require('../util/commandUtil');
-const resolveIndex = require('../util/resolveIndex');
+const { resolveIndex, getIndexRegex } = require("../util/indexUtil");
 
 // TODO Implementar limitação da durtação dos vídeos, pesquisa
 // e no futuro busca em outros serviços de vídeos/áudio.
@@ -123,7 +123,7 @@ const playAgain = new Command(
     },
 
     async (message, argument, serverPlayer) => {
-        const result = /^(\d+|last|next)$/g.exec(argument);
+        const result = getIndexRegex().exec(argument);
         if (!result) {
             return message.reply('Uso errado do comando! Deve ser -pa 3 por exemplo :v');
         }

@@ -1,6 +1,6 @@
 // Comando para manipular a playlist movendo elementos dela pelos indexes
 const Command = require("../domain/Command");
-const resolveIndex = require('../util/resolveIndex');
+const { resolveIndex, getTwoIndexesRegex } = require("../util/indexUtil");
 const { messageStartsWithCommand } = require('../util/commandUtil');
 
 const skip = new Command(
@@ -9,7 +9,7 @@ const skip = new Command(
     },
 
     async (message, argument, serverPlayer) => {
-        const indexes = /^(\d+|last|next) \s*(\d+|last|next)$/g.exec(argument);
+        const indexes = getTwoIndexesRegex().exec(argument);
 
         if (!indexes) {
             return message.reply('Uso errado do comando! Deve ser -mv 3 2 por exemplo :v');
