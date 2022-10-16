@@ -1,8 +1,14 @@
 const { Client } = require('discord.js');
-const { Intents } = require('discord.js');
+const { GatewayIntentBits } = require('discord.js');
 
-let client = new Client({
-    intents: [Intents.FLAGS.GUILDS, Intents.FLAGS.GUILD_MESSAGES, Intents.FLAGS.GUILD_VOICE_STATES, Intents.FLAGS.DIRECT_MESSAGES],
+const client = new Client({
+    intents: [
+        GatewayIntentBits.Guilds,
+        GatewayIntentBits.GuildMessages,
+        GatewayIntentBits.GuildVoiceStates,
+        GatewayIntentBits.DirectMessages,
+        GatewayIntentBits.MessageContent,
+    ],
     partials : ['CHANNEL', 'MESSAGE'],
 });
 

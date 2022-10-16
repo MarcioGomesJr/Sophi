@@ -5,7 +5,7 @@ const { messageStartsWithCommand } = require('../util/commandUtil');
 
 const remove = new Command(
     (message, normalizedMessage) => {
-        return messageStartsWithCommand(normalizedMessage, ['remove', 'r']);
+        return messageStartsWithCommand(normalizedMessage, ['remove', 'r', 'rm']);
     },
 
     async (message, argument, serverPlayer) => {
