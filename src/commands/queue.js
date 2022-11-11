@@ -1,5 +1,5 @@
 const Command = require("../domain/Command");
-const { MessageEmbed } = require('discord.js');
+const { EmbedBuilder } = require('discord.js');
 const { messageIsCommand } = require('../util/commandUtil');
 
 const queue = new Command(
@@ -18,7 +18,7 @@ const queue = new Command(
             return acc += `${index + 1} - ${ytInfo.title} ${index === serverPlayer.currentSongIndex ? ' **-> Tocando atualmente :3**' : ''}\n${ytInfo.url}\n`;
         }, '');
 
-        const playlistMessage = new MessageEmbed()
+        const playlistMessage = new EmbedBuilder()
         .setColor(0x1F85DE)
         .setTitle('**Playlist**')
         .setDescription('As próximas músicas a serem tocadas =^.^=\n\n' + nextSongs);
