@@ -1,4 +1,4 @@
-const possibleIndexString = '(\d+|first|previous|this|next|last)';
+const possibleIndexString = '[-+]?\\d+|first|previous|this|next|last';
 
 module.exports = {
     resolveIndex: (indexS, serverPlayer) => {
@@ -18,19 +18,20 @@ module.exports = {
             return serverPlayer.playlist.length - 1;
         }
         
+        const isRelativeIndex = indexS.startsWith('-') || indexS.startsWith('+');
         const index = Number(indexS);
-        if (index < 0) {
-            return serverPlayer.playlist.length - 1 - index;
+        if (isRelativeIndex) {
+            return serverPlayer.currentSongIndex + index;
         }
     
         return index - 1;
     },
 
     getIndexRegex: () => {
-        return /^(\d+|first|previous|this|next|last)$/gi;
+        return new RegExp(`^(${possibleIndexString})$`, 'di');
     },
     
     getTwoIndexesRegex: () => {
-        return /^(\d+|first|previous|this|next|last) \s*(\d+|first|previous|this|next|last)$/gi;
+        return new RegExp(`^(${possibleIndexString})\s+(${possibleIndexString})$`, 'gi');
     },
 }
