@@ -3,7 +3,7 @@ const Command = require("../domain/Command");
 const { resolveIndex, getTwoIndexesRegex } = require("../util/indexUtil");
 const { messageStartsWithCommand } = require('../util/commandUtil');
 
-const skip = new Command(
+const move = new Command(
     (message, normalizedMessage) => {
         return messageStartsWithCommand(normalizedMessage, ['move', 'mv']);
     },
@@ -23,4 +23,4 @@ const skip = new Command(
     }
 );
 
-module.exports = skip;
+module.exports = move;

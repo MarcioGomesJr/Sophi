@@ -1,19 +1,17 @@
 // Comandos para adicionar músicas na playlist
 const playdl = require('play-dl');
+const ytdl = require('ytdl-core');
 const radin = require('../player');
-const Command = require("../domain/Command");
+const Command = require('../domain/Command');
 const PlaylistEntry = require('../domain/PlaylistEntry');
 const { messageStartsWithCommand } = require('../util/commandUtil');
-const { resolveIndex, getIndexRegex } = require("../util/indexUtil");
+const { resolveIndex, getIndexRegex } = require('../util/indexUtil');
 
 // TODO Implementar limitação da durtação dos vídeos, pesquisa
 // e no futuro busca em outros serviços de vídeos/áudio.
 async function searchYoutube(searchTerm) {
-    let fuzzy = true;
-
     if (searchTerm.startsWith('https')) {
-        // É um link mas não é do youtube. Por enquanto descartamos
-        if (playdl.yt_validate(searchTerm) === false) {
+        if (playdl.yt_validate(searchTerm) === false && !ytdl.validateURL(searchTerm)) {
             return [null, 'Infelizmente só consigo reproduzir links do YouTube a'];
         }
 
@@ -23,15 +21,17 @@ async function searchYoutube(searchTerm) {
             return searchYoutubePlaylist(searchTerm);
         }
 
-        searchTerm = searchTerm.replace(/&.+$/ig, '');
-        fuzzy = false;
+        searchTerm = searchTerm.replace(/&.+$/gi, '');
 
-        if (playdl.yt_validate(searchTerm) !== 'video') {
-            return [null, 'Infelizmente só consigo reproduzir links de vídeos ou playlists do YouTube a'];
-        }
+        const basicInfo = await ytdl.getBasicInfo(searchTerm);
+        const ytInfo = {
+            title: basicInfo.videoDetails.title,
+            url: searchTerm,
+        };
+        return [[ytInfo], null];
     }
 
-    const [ytInfo] = await playdl.search(searchTerm, { source: { youtube: 'video' }, limit : 1, fuzzy });
+    const [ytInfo] = await playdl.search(searchTerm, { source: { youtube: 'video' }, limit: 1, fuzzy: true });
 
     if (!ytInfo) {
         return [null, 'Infelizmente sua pesquisa não foi encontrada ou não é um link de um vídeo no YouTube aa'];
@@ -68,9 +68,10 @@ function playOrAddToPlaylist(message, serverPlayer, ytInfos, asNext = false) {
     const playlistHasEnded = serverPlayer.playlistHasEnded();
 
     if (ytInfos.length > 1) {
-        message.reply(`Um total de (${ytInfos.length}) músicas foram adicionadas ${asNext ? 'como as próximas' : ''} na queue e.e`);
-    }
-    else if (!playlistHasEnded) {
+        message.reply(
+            `Um total de (${ytInfos.length}) músicas foram adicionadas ${asNext ? 'como as próximas' : ''} na queue e.e`
+        );
+    } else if (!playlistHasEnded) {
         message.reply(`Sua música (${ytInfos[0].title}) foi adicionada ${asNext ? 'como a próxima' : ''} na queue e.e`);
     }
 
