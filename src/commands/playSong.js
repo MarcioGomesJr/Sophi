@@ -44,18 +44,20 @@ async function searchYoutube(searchTerm) {
     return [[ytInfo], null];
 }
 
-async function searchYoutubePlaylist(searchTerm) {
-    if (playdl.yt_validate(searchTerm) !== 'playlist') {
+async function searchYoutubePlaylist(playlistUrl) {
+    if (playdl.yt_validate(playlistUrl) !== 'playlist') {
         return [null, 'Infelizmente só consigo reproduzir links de vídeos ou playlists do YouTube a'];
     }
 
     let videos = null;
 
     try {
-        const playlistInfo = await playdl.playlist_info(searchTerm);
+        const playlistInfo = await playdl.playlist_info(playlistUrl, { incomplete: true });
         await playlistInfo.fetch();
         videos = await playlistInfo.page(1);
-    } catch {}
+    } catch(e) {
+        console.log(`Erro ao obter músicas da playlist: "${playlistUrl}": ${e}\n${e.stack}`);
+    }
 
     if (!videos) {
         return [null, 'Infelizmente ocorreu um erro ao ler os vídeos dessa playlist do YouTube aa'];

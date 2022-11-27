@@ -54,7 +54,7 @@ async function playReq(serverPlayer, playlistEntry, sendMessage) {
 
     try {
         const stream = await play.stream(selectedSong.url);
-        let channelId = message.member.voice?.channel?.id;
+        let channelId = message.member?.voice?.channel?.id;
         if (!channelId) {
             channelId = playlistEntry.originalVoiceChannelId;
         }
