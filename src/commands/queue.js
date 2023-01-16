@@ -67,7 +67,7 @@ function buildQueueString(serverPlayer, page, pageSize) {
             return (acc += `${index + 1} - ${ytInfo.title} ${
                 index === serverPlayer.currentSongIndex ? ' **-> Tocando atualmente :3**' : ''
             }\n${ytInfo.url}\n`);
-        }, '') + `\n**${page}/${(serverPlayer.playlist.length / pageSize).toFixed(0)}**`;
+        }, '') + `\n**${page + 1}/${((serverPlayer.playlist.length / pageSize) + 1).toFixed(0)}**`;
 }
 
 function buildQueueEmbed(nextSongs) {
