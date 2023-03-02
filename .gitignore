@@ -1,6 +1,7 @@
-/.idea
-/.vscode
-/node_modules
+.idea/
+.vscode/
+.DS_Store
+node_modules/
 /src/token.js
 /src/config.json
 debug.log
