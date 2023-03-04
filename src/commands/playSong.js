@@ -6,6 +6,7 @@ const Command = require('../domain/Command');
 const PlaylistEntry = require('../domain/PlaylistEntry');
 const { messageStartsWithCommand } = require('../util/commandUtil');
 const { resolveIndex, getIndexRegex } = require('../util/indexUtil');
+const SophiError = require('../domain/SophiError');
 
 // TODO Implementar limitação da durtação dos vídeos, pesquisa
 // e no futuro busca em outros serviços de vídeos/áudio.
@@ -23,12 +24,17 @@ async function searchYoutube(searchTerm) {
 
         searchTerm = searchTerm.replace(/&.+$/gi, '');
 
-        const basicInfo = await ytdl.getBasicInfo(searchTerm);
-        const ytInfo = {
-            title: basicInfo.videoDetails.title,
-            url: searchTerm,
-        };
-        return [[ytInfo], null];
+        try {
+            const basicInfo = await ytdl.getBasicInfo(searchTerm);
+            const ytInfo = {
+                title: basicInfo.videoDetails.title,
+                url: searchTerm,
+            };
+            return [[ytInfo], null];
+        } catch (e) {
+            console.log(`Erro ao buscar informação da música ${searchTerm}\n`, e);
+            throw new SophiError(`Não consegui obter informações do vídeo ${searchTerm} ~w~\nProvavelmetne é privada ou com restrição de idade a`);
+        }
     }
 
     const [ytInfo] = await playdl.search(searchTerm, { source: { youtube: 'video' }, limit: 1, fuzzy: true });
