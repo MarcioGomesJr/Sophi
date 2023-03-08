@@ -7,13 +7,18 @@ const PlaylistEntry = require('../domain/PlaylistEntry');
 const { messageStartsWithCommand } = require('../util/commandUtil');
 const { resolveIndex, getIndexRegex } = require('../util/indexUtil');
 const SophiError = require('../domain/SophiError');
+const { getSpotifyClient } = require('../util/singletonManager');
 
-// TODO Implementar limitação da durtação dos vídeos, pesquisa
-// e no futuro busca em outros serviços de vídeos/áudio.
-async function searchYoutube(searchTerm) {
+const spotifyClient = getSpotifyClient();
+
+// TODO Implementar limitação da duração dos vídeos e pesquisa
+async function searchTrack(searchTerm) {
     if (searchTerm.startsWith('https')) {
-        if (playdl.yt_validate(searchTerm) === false && !ytdl.validateURL(searchTerm)) {
-            return [null, 'Infelizmente só consigo reproduzir links do YouTube a'];
+
+        if (searchTerm.includes('spotify') && spotifyClient) {
+            return searchSpotify(searchTerm);
+        } else if (playdl.yt_validate(searchTerm) === false && !ytdl.validateURL(searchTerm)) {
+            return [null, 'Infelizmente só consigo reproduzir links do YouTube ou Spotify a'];
         }
 
         // Supostamente é uma playlist do youtube. Validamos desse jeito pois se o vídeo faz parte de uma playlist
@@ -48,6 +53,55 @@ async function searchYoutube(searchTerm) {
     }
 
     return [[ytInfo], null];
+}
+
+async function searchSpotify(searchTerm) {
+    const id = searchTerm.split('/').pop();
+    if (searchTerm.includes('playlist')) {
+        const playlistData = await spotifyClient.getPlaylist(id, { limit: 50, offset: 0 });
+
+        if (!playlistData) {
+            return [null, 'Esse não parece um link válido de uma playlist do spotify a'];
+        }
+
+        const items = playlistData.body.tracks.items.map(it => it.track.id);
+        const tracks = await getTracksFromSpotifyIdList(items);
+
+        return [tracks, null];
+    } else if (searchTerm.includes('album')) {
+        const albumData = await spotifyClient.getAlbumTracks(id, { limit: 50, offset: 0 });
+
+        if (!albumData) {
+            return [null, 'Esse não parece um link válido de um álbum spotify a'];
+        }
+
+        const items = albumData.body.tracks.items.map(it => it.id);
+        const tracks = await getTracksFromSpotifyIdList(items);
+
+        return [tracks, null];
+    } else {
+        return searchSpotifyTrack(id);
+    }
+}
+
+async function getTracksFromSpotifyIdList(spotifyIdList) {
+    return Promise.all(
+        spotifyIdList.map(async (id) => {
+            const trackInfo = await searchSpotifyTrack(id);
+            return trackInfo[0][0];
+        })
+    );
+}
+
+async function searchSpotifyTrack(trackId) {
+    const data = await spotifyClient.getTrack(trackId);
+
+    if (!data) {
+        return [null, 'Esse não parece um link válido do spotify a'];
+    }
+
+    const newSearchTerm = `${data.body.artists.map(artist => artist.name)} ${data.body.name}`;
+    return searchTrack(newSearchTerm);
 }
 
 async function searchYoutubePlaylist(playlistUrl) {
@@ -100,7 +154,7 @@ const play = new Command(
     },
 
     async (message, argument, serverPlayer) => {
-        const [ytInfos, error] = await searchYoutube(argument);
+        const [ytInfos, error] = await searchTrack(argument);
 
         if (error) {
             return message.reply(error);
@@ -116,7 +170,7 @@ const playNext = new Command(
     },
 
     async (message, argument, serverPlayer) => {
-        const [ytInfos, error] = await searchYoutube(argument);
+        const [ytInfos, error] = await searchTrack(argument);
 
         if (error) {
             return message.reply(error);
