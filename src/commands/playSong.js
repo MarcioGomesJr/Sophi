@@ -9,15 +9,17 @@ const { resolveIndex, getIndexRegex } = require('../util/indexUtil');
 const SophiError = require('../domain/SophiError');
 const { getSpotifyClient } = require('../util/singletonManager');
 
-const spotifyClient = getSpotifyClient();
-
 // TODO Implementar limitação da duração dos vídeos e pesquisa
 async function searchTrack(searchTerm) {
     if (searchTerm.startsWith('https')) {
 
-        if (searchTerm.includes('spotify') && spotifyClient) {
-            return searchSpotify(searchTerm);
-        } else if (playdl.yt_validate(searchTerm) === false && !ytdl.validateURL(searchTerm)) {
+        if (searchTerm.includes('spotify')) {
+            const spotifyClient = await getSpotifyClient();
+            if (spotifyClient) {
+                return searchSpotify(searchTerm, spotifyClient);
+            }
+        }
+        if (playdl.yt_validate(searchTerm) === false && !ytdl.validateURL(searchTerm)) {
             return [null, 'Infelizmente só consigo reproduzir links do YouTube ou Spotify a'];
         }
 
@@ -55,7 +57,7 @@ async function searchTrack(searchTerm) {
     return [[ytInfo], null];
 }
 
-async function searchSpotify(searchTerm) {
+async function searchSpotify(searchTerm, spotifyClient) {
     const id = searchTerm.split('/').pop();
     if (searchTerm.includes('playlist')) {
         const playlistData = await spotifyClient.getPlaylist(id, { limit: 50, offset: 0 });
@@ -65,7 +67,7 @@ async function searchSpotify(searchTerm) {
         }
 
         const items = playlistData.body.tracks.items.map(it => it.track.id);
-        const tracks = await getTracksFromSpotifyIdList(items);
+        const tracks = await getTracksFromSpotifyIdList(items, spotifyClient);
 
         return [tracks, null];
     } else if (searchTerm.includes('album')) {
@@ -76,24 +78,24 @@ async function searchSpotify(searchTerm) {
         }
 
         const items = albumData.body.tracks.items.map(it => it.id);
-        const tracks = await getTracksFromSpotifyIdList(items);
+        const tracks = await getTracksFromSpotifyIdList(items, spotifyClient);
 
         return [tracks, null];
     } else {
-        return searchSpotifyTrack(id);
+        return searchSpotifyTrack(id, spotifyClient);
     }
 }
 
-async function getTracksFromSpotifyIdList(spotifyIdList) {
+async function getTracksFromSpotifyIdList(spotifyIdList, spotifyClient) {
     return Promise.all(
         spotifyIdList.map(async (id) => {
-            const trackInfo = await searchSpotifyTrack(id);
+            const trackInfo = await searchSpotifyTrack(id, spotifyClient);
             return trackInfo[0][0];
         })
     );
 }
 
-async function searchSpotifyTrack(trackId) {
+async function searchSpotifyTrack(trackId, spotifyClient) {
     const data = await spotifyClient.getTrack(trackId);
 
     if (!data) {
