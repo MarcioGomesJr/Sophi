@@ -19,13 +19,18 @@ const queue = new Command(
 
         const nextSongs = buildQueueString(serverPlayer, page, pageSize);
         const playlistMessage = buildQueueEmbed(nextSongs);
-        const queueMessage = await message.channel.send({ embeds: [playlistMessage] });
+        const queueMessage = await message.channel.send({
+            embeds: [playlistMessage],
+        });
 
         await queueMessage.react('◀️');
         await queueMessage.react('▶️');
 
         const filter = (reaction, user) => {
-            return user.id !== queueMessage.author.id && (reaction.emoji.name === '◀️' || reaction.emoji.name === '▶️');
+            return (
+                user.id !== queueMessage.author.id &&
+                (reaction.emoji.name === '◀️' || reaction.emoji.name === '▶️')
+            );
         };
         const collector = queueMessage.createReactionCollector({
             filter,
@@ -47,7 +52,7 @@ const queue = new Command(
                 page--;
             }
 
-            const newQueue = buildQueueString(serverPlayer, page, pageSize);
+            const newQueue = buildQueueString(serverPlayer, page, pageSize, numberOfPages);
             queueMessage.edit({ embeds: [buildQueueEmbed(newQueue)] });
         };
 
@@ -56,22 +61,24 @@ const queue = new Command(
     }
 );
 
-function buildQueueString(serverPlayer, page, pageSize) {
+function buildQueueString(serverPlayer, page, pageSize, numberOfPages) {
     const queueFirstIndex = page * pageSize;
 
-    return serverPlayer.playlist
-        .slice(queueFirstIndex, queueFirstIndex + pageSize)
-        .reduce((acc, playlistEntry, index) => {
-            const ytInfo = playlistEntry.ytInfo;
-            index += queueFirstIndex;
-            return (acc += `${index + 1} - ${ytInfo.title} ${
-                index === serverPlayer.currentSongIndex ? ' **-> Tocando atualmente :3**' : ''
-            }\n${ytInfo.url}\n`);
-        }, '') + `\n**${page + 1}/${((serverPlayer.playlist.length / pageSize) + 1).toFixed(0)}**`;
+    return (
+        serverPlayer.playlist
+            .slice(queueFirstIndex, queueFirstIndex + pageSize)
+            .reduce((acc, playlistEntry, index) => {
+                const ytInfo = playlistEntry.ytInfo;
+                index += queueFirstIndex;
+                return (acc += `${index + 1} - ${ytInfo.title} ${
+                    index === serverPlayer.currentSongIndex ? ' **-> Tocando atualmente :3**' : ''
+                }\n${ytInfo.url}\n`);
+            }, '') + `\n**${page + 1}/${numberOfPages}**`
+    );
 }
 
 function buildQueueEmbed(nextSongs) {
-    return new EmbedBuilder()   
+    return new EmbedBuilder()
         .setColor(0x1f85de)
         .setTitle('**Playlist**')
         .setDescription('As próximas músicas a serem tocadas =^.^=\n\n' + nextSongs);

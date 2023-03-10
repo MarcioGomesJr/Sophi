@@ -1,4 +1,4 @@
-const { getClient } = require('./src/util/singletonManager');
+const { getClient } = require('./src/util/clientManager');
 const ServerPlayer = require('./src/domain/ServerPlayer');
 const SophiError = require('./src/domain/SophiError');
 

@@ -1,4 +1,4 @@
-const radin = require('../player');
+const radin = require('../botfunctions/player');
 const { createAudioPlayer, NoSubscriberBehavior } = require('@discordjs/voice');
 const SophiError = require('../domain/SophiError');
 

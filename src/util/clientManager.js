@@ -2,7 +2,7 @@ const { Client, GatewayIntentBits } = require('discord.js');
 const { spotify_client_id, spotify_client_secret } = require('../token');
 const SpotifyWebApi = require('spotify-web-api-node');
 
-const client = new Client({
+const discordClient = new Client({
     intents: [
         GatewayIntentBits.Guilds,
         GatewayIntentBits.GuildMessages,
@@ -24,12 +24,13 @@ if (spotify_client_id && spotify_client_secret) {
         clientSecret: spotify_client_secret,
     });
 
-    fillAuthData(spotifyClient.clientCredentialsGrant());
+    fillAuthData(spotifyClient);
 }
 
-function fillAuthData(authProvider) {
+function fillAuthData(spotifyClient) {
     return new Promise((resolve, reject) => {
-        authProvider
+        spotifyClient
+            .clientCredentialsGrant()
             .then((data) => {
                 const token = data.body['access_token'];
                 expiresIn = data.body['expires_in'];
@@ -47,17 +48,19 @@ function fillAuthData(authProvider) {
 
 module.exports = {
     getClient() {
-        return client;
+        return discordClient;
     },
     getSpotifyClient() {
         if (!spotifyClient) {
             return Promise.resolve(null);
         }
 
-        const timeDifference = new Date().getTime() - credentialGrantedOn.getTime();
+        const timeDifference = (new Date().getTime() - credentialGrantedOn.getTime()) / 1000;
+        console.log(timeDifference);
+        console.log(expiresIn - 100);
 
-        if (timeDifference / (1000 * 60) >= expiresIn) {
-            return fillAuthData(spotifyClient.refreshAccessToken());
+        if (timeDifference >= expiresIn - 100) {
+            return fillAuthData(spotifyClient);
         } else {
             return Promise.resolve(spotifyClient);
         }
