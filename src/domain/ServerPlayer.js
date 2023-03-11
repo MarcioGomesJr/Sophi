@@ -11,7 +11,7 @@ class ServerPlayer {
         this.voiceConnection = null;
         this.audioPlayer = createAudioPlayer({
             behaviors: {
-                noSubscriber: NoSubscriberBehavior.Pause,
+                noSubscriber: NoSubscriberBehavior.Play,
             }
         });
     }

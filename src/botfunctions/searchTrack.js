@@ -1,19 +1,12 @@
 const playdl = require('play-dl');
 const ytdl = require('ytdl-core');
-const SophiError = require('../domain/SophiError');
-const { getSpotifyClient } = require('../util/clientManager');
+const {getSpotifyClient} = require('../util/clientManager');
 
 // TODO Implementar limitação da duração dos vídeos e pesquisa
 async function searchTrack(searchTerm) {
     if (searchTerm.startsWith('https')) {
-
         if (/^(spotify:|https:\/\/[a-z]+\.spotify\.com\/)/.test(searchTerm)) {
-            const spotifyClient = await getSpotifyClient();
-            if (spotifyClient) {
-                return searchSpotify(searchTerm, spotifyClient);
-            } else {
-                return [null, 'Infelizmente só consigo reproduzir links do YouTube no momento =x'];
-            }
+            return searchSpotify(searchTerm);
         }
         if (playdl.yt_validate(searchTerm) === false && !ytdl.validateURL(searchTerm)) {
             return [null, 'Infelizmente só consigo reproduzir links do YouTube ou Spotify a'];
@@ -25,22 +18,10 @@ async function searchTrack(searchTerm) {
             return searchYoutubePlaylist(searchTerm);
         }
 
-        searchTerm = searchTerm.replace(/&.+$/gi, '');
-
-        try {
-            const basicInfo = await ytdl.getBasicInfo(searchTerm);
-            const ytInfo = {
-                title: basicInfo.videoDetails.title,
-                url: searchTerm,
-            };
-            return [[ytInfo], null];
-        } catch (e) {
-            console.log(`Erro ao buscar informação da música ${searchTerm}\n`, e);
-            throw new SophiError(`Não consegui obter informações do vídeo ${searchTerm} ~w~\nProvavelmetne é privada ou com restrição de idade a`);
-        }
+        return searchYoutubeLink(searchTerm);
     }
 
-    const [ytInfo] = await playdl.search(searchTerm, { source: { youtube: 'video' }, limit: 1, fuzzy: true });
+    const [ytInfo] = await playdl.search(searchTerm, {source: {youtube: 'video'}, limit: 1, fuzzy: true});
 
     if (!ytInfo) {
         return [null, 'Infelizmente sua pesquisa não foi encontrada ou não é um link de um vídeo no YouTube aa'];
@@ -53,30 +34,34 @@ async function searchTrack(searchTerm) {
     return [[ytInfo], null];
 }
 
-async function searchSpotify(spotifyLink, spotifyClient) {
+async function searchSpotify(spotifyLink) {
+    const spotifyClient = await getSpotifyClient();
+    if (!spotifyClient) {
+        return [null, 'Infelizmente só consigo reproduzir links do YouTube no momento =x'];
+    }
     try {
         const id = spotifyLink.split('/').pop();
         if (spotifyLink.includes('/playlist')) {
             const playlistData = await spotifyClient.getPlaylist(id, { limit: 50, offset: 0 });
-    
+
             if (!playlistData) {
                 return [null, 'Esse não parece um link válido de uma playlist do spotify a'];
             }
-    
+
             const ids = playlistData.body.tracks.items.map(it => it.track.id);
             const tracks = await getTracksFromSpotifyIdList(ids, spotifyClient);
-    
+
             return [tracks, null];
         } else if (spotifyLink.includes('/album')) {
             const albumData = await spotifyClient.getAlbumTracks(id, { limit: 50, offset: 0 });
-    
+
             if (!albumData) {
                 return [null, 'Esse não parece um link válido de um álbum spotify a'];
             }
-    
+
             const ids = albumData.body.tracks.items.map(it => it.id);
             const tracks = await getTracksFromSpotifyIdList(ids, spotifyClient);
-    
+
             return [tracks, null];
         } else {
             return searchSpotifyTrack(id, spotifyClient);
@@ -107,6 +92,21 @@ async function searchSpotifyTrack(trackId, spotifyClient) {
     return searchTrack(newSearchTerm);
 }
 
+async function searchYoutubeLink(searchTerm) {
+    try {
+        searchTerm = searchTerm.replace(/&.+$/gi, '');
+        const basicInfo = await ytdl.getBasicInfo(searchTerm);
+        const ytInfo = {
+            title: basicInfo.videoDetails.title,
+            url: searchTerm,
+        };
+        return [[ytInfo], null];
+    } catch (e) {
+        console.log(`Erro ao buscar informação da música ${searchTerm}\n`, e);
+        return [null, `Não consegui obter informações do vídeo ${searchTerm} ~w~\nProvavelmetne é privada ou com restrição de idade a`];
+    }
+}
+
 async function searchYoutubePlaylist(playlistUrl) {
     if (playdl.yt_validate(playlistUrl) !== 'playlist') {
         return [null, 'Infelizmente só consigo reproduzir links de vídeos ou playlists do YouTube a'];
@@ -115,10 +115,10 @@ async function searchYoutubePlaylist(playlistUrl) {
     let videos = null;
 
     try {
-        const playlistInfo = await playdl.playlist_info(playlistUrl, { incomplete: true });
+        const playlistInfo = await playdl.playlist_info(playlistUrl, {incomplete: true});
         await playlistInfo.fetch();
-        videos = await playlistInfo.page(1);
-    } catch(e) {
+        videos = playlistInfo.page(1);
+    } catch (e) {
         console.log(`Erro ao obter músicas da playlist: "${playlistUrl}": ${e}\n${e.stack}`);
     }
 

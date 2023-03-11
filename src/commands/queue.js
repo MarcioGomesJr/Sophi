@@ -17,7 +17,7 @@ const queue = new Command(
         const numberOfPages = Math.ceil(serverPlayer.playlist.length / pageSize);
         let page = Math.floor(serverPlayer.currentSongIndex / pageSize);
 
-        const nextSongs = buildQueueString(serverPlayer, page, pageSize);
+        const nextSongs = buildQueueString(serverPlayer, page, pageSize, numberOfPages);
         const playlistMessage = buildQueueEmbed(nextSongs);
         const queueMessage = await message.channel.send({
             embeds: [playlistMessage],
@@ -56,6 +56,7 @@ const queue = new Command(
             queueMessage.edit({ embeds: [buildQueueEmbed(newQueue)] });
         };
 
+
         collector.on('collect', changePage);
         collector.on('remove', changePage);
     }
@@ -70,7 +71,7 @@ function buildQueueString(serverPlayer, page, pageSize, numberOfPages) {
             .reduce((acc, playlistEntry, index) => {
                 const ytInfo = playlistEntry.ytInfo;
                 index += queueFirstIndex;
-                return (acc += `${index + 1} - ${ytInfo.title} ${
+                return (acc + `${index + 1} - ${ytInfo.title} ${
                     index === serverPlayer.currentSongIndex ? ' **-> Tocando atualmente :3**' : ''
                 }\n${ytInfo.url}\n`);
             }, '') + `\n**${page + 1}/${numberOfPages}**`
