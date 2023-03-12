@@ -40,6 +40,7 @@ async function searchSpotify(spotifyLink) {
         return [null, 'Infelizmente só consigo reproduzir links do YouTube no momento =x'];
     }
     try {
+        spotifyLink = spotifyLink.replace(/&.+$/gi, '');
         const id = spotifyLink.split('/').pop();
         if (spotifyLink.includes('/playlist')) {
             const playlistData = await spotifyClient.getPlaylist(id, { limit: 50, offset: 0 });
