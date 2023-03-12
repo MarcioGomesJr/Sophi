@@ -86,11 +86,11 @@ async function playReq(serverPlayer, playlistEntry, sendMessage) {
         connection.subscribe(audioPlayer);
 
         // Correção temporária para https://github.com/discordjs/discord.js/issues/9185
-        connection.on('stateChange', (old_state, new_state) => {
-            if (old_state.status === VoiceConnectionStatus.Ready && new_state.status === VoiceConnectionStatus.Connecting) {
-                connection.configureNetworking();
-            }
-        });
+        // connection.on('stateChange', (old_state, new_state) => {
+        //     if (old_state.status === VoiceConnectionStatus.Ready && new_state.status === VoiceConnectionStatus.Connecting) {
+        //         connection.configureNetworking();
+        //     }
+        // });
 
         return true;
     } catch(e) {

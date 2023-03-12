@@ -32,6 +32,6 @@ module.exports = {
     },
     
     getTwoIndexesRegex: () => {
-        return new RegExp(`^(${possibleIndexString})\s+(${possibleIndexString})$`, 'gi');
+        return new RegExp(`^(${possibleIndexString})\\s+(${possibleIndexString})$`, 'gi');
     },
 }

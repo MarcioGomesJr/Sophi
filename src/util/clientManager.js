@@ -18,15 +18,6 @@ let spotifyClient = null;
 let expiresIn = null;
 let credentialGrantedOn = null;
 
-if (spotify_client_id && spotify_client_secret) {
-    spotifyClient = new SpotifyWebApi({
-        clientId: spotify_client_id,
-        clientSecret: spotify_client_secret,
-    });
-
-    fillAuthData(spotifyClient);
-}
-
 function fillAuthData(spotifyClient) {
     return new Promise((resolve, reject) => {
         spotifyClient
@@ -43,7 +34,7 @@ function fillAuthData(spotifyClient) {
                 console.log('Erro ao atualizar token do spotify:', error);
                 reject(error);
             });
-        });
+    });
 }
 
 module.exports = {
@@ -52,12 +43,19 @@ module.exports = {
     },
     getSpotifyClient() {
         if (!spotifyClient) {
-            return Promise.resolve(null);
+            if (spotify_client_id && spotify_client_secret) {
+                spotifyClient = new SpotifyWebApi({
+                    clientId: spotify_client_id,
+                    clientSecret: spotify_client_secret,
+                });
+
+                return fillAuthData(spotifyClient);
+            } else {
+                return Promise.resolve(null);
+            }
         }
 
         const timeDifference = (new Date().getTime() - credentialGrantedOn.getTime()) / 1000;
-        console.log(timeDifference);
-        console.log(expiresIn - 100);
 
         if (timeDifference >= expiresIn - 100) {
             return fillAuthData(spotifyClient);

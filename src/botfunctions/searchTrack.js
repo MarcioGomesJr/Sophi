@@ -24,11 +24,11 @@ async function searchTrack(searchTerm) {
     const [ytInfo] = await playdl.search(searchTerm, {source: {youtube: 'video'}, limit: 1, fuzzy: true});
 
     if (!ytInfo) {
-        return [null, 'Infelizmente sua pesquisa não foi encontrada ou não é um link de um vídeo no YouTube aa'];
+        return [null, 'Infelizmente sua pesquisa não foi encontrada =('];
     }
 
     if (ytInfo.discretionAdvised) {
-        return [null, `Não foi possível reproduzir a música (${ytInfo.title})\nPois ela tem restrição de idade @w@`];
+        return [null, `Não foi possível reproduzir o vídeo (${ytInfo.title})\nPois ele tem restrição de idade @w@`];
     }
 
     return [[ytInfo], null];
@@ -48,10 +48,9 @@ async function searchSpotify(spotifyLink) {
                 return [null, 'Esse não parece um link válido de uma playlist do spotify a'];
             }
 
-            const ids = playlistData.body.tracks.items.map(it => it.track.id);
-            const tracks = await getTracksFromSpotifyIdList(ids, spotifyClient);
+            const tracks = playlistData.body.tracks.items.map(it => it.track);
 
-            return [tracks, null];
+            return getYtInfosFromSpotifyTracks(tracks);
         } else if (spotifyLink.includes('/album')) {
             const albumData = await spotifyClient.getAlbumTracks(id, { limit: 50, offset: 0 });
 
@@ -59,12 +58,17 @@ async function searchSpotify(spotifyLink) {
                 return [null, 'Esse não parece um link válido de um álbum spotify a'];
             }
 
-            const ids = albumData.body.tracks.items.map(it => it.id);
-            const tracks = await getTracksFromSpotifyIdList(ids, spotifyClient);
+            const tracks = albumData.body.tracks.items;
 
-            return [tracks, null];
+            return getYtInfosFromSpotifyTracks(tracks);
         } else {
-            return searchSpotifyTrack(id, spotifyClient);
+            const trackData = await spotifyClient.getTrack(id);
+
+            if (!trackData) {
+                return [null, 'Esse não parece um link válido do spotify a'];
+            }
+
+            return searchSpotifyTrack(trackData.body, spotifyClient);
         }
     } catch (e) {
         console.log('Erro ao buscar música pelo link do spotify: ' + spotifyLink, e);
@@ -72,24 +76,22 @@ async function searchSpotify(spotifyLink) {
     }
 }
 
-async function getTracksFromSpotifyIdList(spotifyIdList, spotifyClient) {
-    return Promise.all(
-        spotifyIdList.map(async (id) => {
-            const trackInfo = await searchSpotifyTrack(id, spotifyClient);
+async function getYtInfosFromSpotifyTracks(spotifyTracks) {
+    const infos = await Promise.all(
+        spotifyTracks.map(async (track) => {
+            const trackInfo = await searchSpotifyTrack(track);
             return trackInfo[0][0];
         })
     );
+
+    const foundInfos = infos.filter(it => !!it);
+
+    return [foundInfos, null];
 }
 
-async function searchSpotifyTrack(trackId, spotifyClient) {
-    const data = await spotifyClient.getTrack(trackId);
-
-    if (!data) {
-        return [null, 'Esse não parece um link válido do spotify a'];
-    }
-
-    const newSearchTerm = `${data.body.artists.map(artist => artist.name)} ${data.body.name}`;
-    return searchTrack(newSearchTerm);
+async function searchSpotifyTrack(track) {
+    const searchTerm = `${track.artists.map(artist => artist.name).join(',')} ${track.name}`;
+    return searchTrack(searchTerm);
 }
 
 async function searchYoutubeLink(searchTerm) {
