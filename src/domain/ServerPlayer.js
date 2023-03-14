@@ -117,6 +117,15 @@ class ServerPlayer {
         this.playlist = [];
         this.audioPlayer.stop();
     }
+
+    shufflePlaylist() {
+        if (this.currentSongIndex + 2 >= this.playlist.length) {
+            return;
+        }
+        const playlistCopy = [...this.playlist];
+        const restOfPlaylist = playlistCopy.splice(this.currentSongIndex + 1);
+        this.playlist = [...playlistCopy, ...restOfPlaylist.sort(() => 0.5 - Math.random())];
+    }
 }
 
 module.exports = ServerPlayer;
