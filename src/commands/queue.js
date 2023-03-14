@@ -23,11 +23,14 @@ const queue = new Command(
             embeds: [playlistMessage],
         });
 
-        await queueMessage.react('🏠');
-        await queueMessage.react('⏪');
-        await queueMessage.react('◀️');
-        await queueMessage.react('▶️');
-        await queueMessage.react('⏩');
+        // TODO validar se assim está sempre indo na ordem certa
+        await Promise.all([
+            queueMessage.react('🏠'),
+            queueMessage.react('⏪'),
+            queueMessage.react('◀️'),
+            queueMessage.react('▶️'),
+            queueMessage.react('⏩'),
+        ]);
 
         const filter = (reaction, user) => {
             return user.id !== queueMessage.author.id && '🏠⏪◀️▶️⏩'.includes(reaction.emoji.name);
@@ -58,7 +61,7 @@ const queue = new Command(
                 }
                 page--;
             } else {
-                page = numberOfPages;
+                page = numberOfPages - 1;
             }
 
             const newQueue = buildQueueString(serverPlayer, page, pageSize, numberOfPages);
