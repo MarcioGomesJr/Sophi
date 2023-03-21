@@ -30,6 +30,8 @@ async function radin(serverPlayer, sendMessage=true) {
             }
         }, 10800000); // Three hours
 
+        serverPlayer.checkPlayingToNoOne(playlistEntry.originalVoiceChannelId, playlistEntry.message);
+
         if (playlistEntry.stopRadin) {
             return;
         }
@@ -54,10 +56,7 @@ async function playReq(serverPlayer, playlistEntry, sendMessage) {
 
     try {
         const stream = await play.stream(selectedSong.url);
-        let channelId = message.member?.voice?.channel?.id;
-        if (!channelId) {
-            channelId = playlistEntry.originalVoiceChannelId;
-        }
+        const channelId = playlistEntry.originalVoiceChannelId;
 
         const joinOptions = {
             channelId,

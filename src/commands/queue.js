@@ -14,7 +14,7 @@ const queue = new Command(
         }
 
         const pageSize = 10;
-        const numberOfPages = Math.ceil(serverPlayer.playlist.length / pageSize);
+        let numberOfPages = Math.ceil(serverPlayer.playlist.length / pageSize);
         let page = Math.floor(serverPlayer.currentSongIndex / pageSize);
 
         const nextSongs = buildQueueString(serverPlayer, page, pageSize, numberOfPages);
@@ -23,14 +23,17 @@ const queue = new Command(
             embeds: [playlistMessage],
         });
 
-        await queueMessage.react('◀️');
-        await queueMessage.react('▶️');
+        // TODO validar se assim está sempre indo na ordem certa
+        await Promise.all([
+            queueMessage.react('🏠'),
+            queueMessage.react('⏪'),
+            queueMessage.react('◀️'),
+            queueMessage.react('▶️'),
+            queueMessage.react('⏩'),
+        ]);
 
         const filter = (reaction, user) => {
-            return (
-                user.id !== queueMessage.author.id &&
-                (reaction.emoji.name === '◀️' || reaction.emoji.name === '▶️')
-            );
+            return user.id !== queueMessage.author.id && '🏠⏪◀️▶️⏩'.includes(reaction.emoji.name);
         };
         const collector = queueMessage.createReactionCollector({
             filter,
@@ -40,22 +43,30 @@ const queue = new Command(
         });
 
         const changePage = (reaction, user) => {
-            if (reaction.emoji.name === '▶️') {
+            const emoji = reaction.emoji.name;
+            numberOfPages = Math.ceil(serverPlayer.playlist.length / pageSize);
+
+            if (emoji === '🏠') {
+                page = Math.floor(serverPlayer.currentSongIndex / pageSize);
+            } else if (emoji === '⏪') {
+                page = 0;
+            } else if (emoji === '▶️') {
                 if (page + 1 === numberOfPages) {
                     return;
                 }
                 page++;
-            } else {
+            } else if (emoji === '◀️') {
                 if (page === 0) {
                     return;
                 }
                 page--;
+            } else {
+                page = numberOfPages - 1;
             }
 
             const newQueue = buildQueueString(serverPlayer, page, pageSize, numberOfPages);
             queueMessage.edit({ embeds: [buildQueueEmbed(newQueue)] });
         };
-
 
         collector.on('collect', changePage);
         collector.on('remove', changePage);
@@ -69,11 +80,12 @@ function buildQueueString(serverPlayer, page, pageSize, numberOfPages) {
         serverPlayer.playlist
             .slice(queueFirstIndex, queueFirstIndex + pageSize)
             .reduce((acc, playlistEntry, index) => {
-                const ytInfo = playlistEntry.ytInfo;
                 index += queueFirstIndex;
-                return (acc + `${index + 1} - ${ytInfo.title} ${
-                    index === serverPlayer.currentSongIndex ? ' **-> Tocando atualmente :3**' : ''
-                }\n${ytInfo.url}\n`);
+
+                const ytInfo = playlistEntry.ytInfo;
+                const currentSongInfo = index === serverPlayer.currentSongIndex ? ' **-> Tocando atualmente :3**' : '';
+
+                return acc + `${index + 1} - ${ytInfo.title} ${currentSongInfo}\n${ytInfo.url}\n`;
             }, '') + `\n**${page + 1}/${numberOfPages}**`
     );
 }

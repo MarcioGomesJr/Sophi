@@ -18,8 +18,10 @@ const move = new Command(
         const from = resolveIndex(indexes[1], serverPlayer);
         const to = resolveIndex(indexes[2], serverPlayer);
 
+        const playlist = serverPlayer.playlist;
+
         serverPlayer.move(from, to);
-        message.channel.send('Músicas movidas uwu');
+        message.channel.send(`Música ${playlist[to].title} trocada com ${playlist[from].title} uwu`);
     }
 );
 
