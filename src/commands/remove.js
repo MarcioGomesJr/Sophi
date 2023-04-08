@@ -11,7 +11,7 @@ const remove = new Command(
     async (message, argument, serverPlayer) => {
         const result = getIndexRegex().exec(argument);
         if (!result) {
-            return message.reply('Uso errado do comando! Deve ser -r 3 por exemplo :v');
+            return message.reply('Uso errado do comando! Deve ser -r 3 por exemplo ou -clear para remover todas :v');
         }
 
         const index = resolveIndex(result[1], serverPlayer);

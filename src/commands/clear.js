@@ -9,7 +9,7 @@ const skip = new Command(
 
     async (message, argument, serverPlayer) => {
         serverPlayer.clearPlaylist();
-        message.channel.send('TA LIMPO 😠');
+        message.channel.send('TÁ LIMPO 😠');
     }
 );
 
