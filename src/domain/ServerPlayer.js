@@ -57,13 +57,14 @@ class ServerPlayer {
             this.checkValidIndex(index);
         }
 
-        this.getCurrentEntry().stopRadin = true;
-        this.audioPlayer.stop();
-
         this.currentSongIndex = index;
+
         if (!this.playlistHasEnded()) {
-            radin(this, sendMessage);
+            this.getCurrentEntry().stopRadin = true;
+            this.audioPlayer.stop();
         }
+
+        radin(this, sendMessage);
     }
 
     checkValidIndex(index) {
