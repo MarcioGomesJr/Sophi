@@ -43,7 +43,7 @@ async function searchSpotify(spotifyLink) {
         spotifyLink = spotifyLink.replace(/&.+$/gi, '');
         const id = spotifyLink.split('/').pop();
         if (spotifyLink.includes('/playlist')) {
-            const playlistData = await spotifyClient.getPlaylist(id, { limit: 50, offset: 0 });
+            const playlistData = await spotifyClient.getPlaylistTracks(id, { limit: 50, offset: 0 });
 
             if (!playlistData) {
                 return [null, 'Esse não parece um link válido de uma playlist do spotify a'];

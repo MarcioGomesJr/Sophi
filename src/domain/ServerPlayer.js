@@ -2,6 +2,7 @@ const radin = require('../botfunctions/player');
 const { createAudioPlayer, NoSubscriberBehavior } = require('@discordjs/voice');
 const { getClient } = require('../util/clientManager');
 const SophiError = require('../domain/SophiError');
+const { withTimeout, Mutex } = require('async-mutex');
 
 class ServerPlayer {
 
@@ -16,6 +17,7 @@ class ServerPlayer {
             }
         });
         this.timesPlayingToNoOne = 0;
+        this.mutex = withTimeout(new Mutex(), 10 * 1000);
     }
 
     addToPlaylist(playlistEntry, asNext = false) {
