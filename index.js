@@ -15,7 +15,7 @@ sophi.on('ready', () => {
 });
 
 sophi.on('messageCreate', async (message) => {
-    if (message.author.bot || message.content[0] !== '?') {
+    if (message.author.bot || message.content[0] !== '-') {
         return;
     }
 
