@@ -41,7 +41,7 @@ async function radin(serverPlayer, sendMessage=true) {
 }
 
 function goToNextSong(serverPlayer) {
-    serverPlayer.currentSongIndex = Math.min(serverPlayer.currentSongIndex + 1, serverPlayer.playlist.length);
+    serverPlayer.currentSongIndex = Math.min(serverPlayer.currentSongIndex + 1, serverPlayer.playlist.length - 1);
 
     if (serverPlayer.playlistHasEnded()) {
         return;
