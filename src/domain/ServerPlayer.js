@@ -5,7 +5,6 @@ const SophiError = require('../domain/SophiError');
 const { withTimeout, Mutex } = require('async-mutex');
 
 class ServerPlayer {
-
     constructor() {
         this.playlist = [];
         this.currentSongIndex = 0;
@@ -14,7 +13,7 @@ class ServerPlayer {
         this.audioPlayer = createAudioPlayer({
             behaviors: {
                 noSubscriber: NoSubscriberBehavior.Play,
-            }
+            },
         });
         this.timesPlayingToNoOne = 0;
         this.mutex = withTimeout(new Mutex(), 10 * 1000);
@@ -49,7 +48,7 @@ class ServerPlayer {
         return this.currentSongIndex >= this.playlist.length;
     }
 
-    skipToSong(index=-1, sendMessage=true) {
+    skipToSong(index = -1, sendMessage = true) {
         if (index === -1) {
             if (this.playlistHasEnded()) {
                 return;
@@ -59,14 +58,20 @@ class ServerPlayer {
             this.checkValidIndex(index);
         }
 
-        this.currentSongIndex = index;
-
         if (!this.playlistHasEnded()) {
             this.getCurrentEntry().stopRadin = true;
+            this.setCurrentSongIndex(index);
             this.audioPlayer.stop();
+        } else {
+            this.setCurrentSongIndex(index);
         }
 
         radin(this, sendMessage);
+    }
+
+    setCurrentSongIndex(index) {
+        this.currentSongIndex = Math.max(0, Math.min(this.playlist.length, index));
+        console.log(this.currentSongIndex);
     }
 
     checkValidIndex(index) {
@@ -96,8 +101,7 @@ class ServerPlayer {
         if (to === this.playlist.length) {
             const playlistEntry = this.removeFromPlaylist(from);
             this.addToPlaylist(playlistEntry.clone());
-        }
-        else {
+        } else {
             const temp = this.playlist[from];
             this.playlist[from] = this.playlist[to];
             this.playlist[to] = temp;
@@ -140,7 +144,7 @@ class ServerPlayer {
             return;
         }
 
-        const membersInChannel = channel.members.filter(member => !member.user.bot);
+        const membersInChannel = channel.members.filter((member) => !member.user.bot);
 
         // Bot está sozinho na sala
         if (membersInChannel.size === 0) {

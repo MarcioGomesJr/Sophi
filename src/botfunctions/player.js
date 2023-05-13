@@ -3,6 +3,11 @@ const { joinVoiceChannel, createAudioResource, AudioPlayerStatus, VoiceConnectio
 
 async function radin(serverPlayer, sendMessage=true) {
     const playlistEntry = serverPlayer.getCurrentEntry();
+    if (!playlistEntry) {
+        console.log(`Um objeto de PlaylistEntry era esperado! playlistL ${serverPlayer.playlist} index: ${serverPlayer.currentSongIndex}`);
+        return;
+    }
+
     const sucesso = await playReq(serverPlayer, playlistEntry, sendMessage);
     clearTimeout(serverPlayer.idleTimer);
 
@@ -41,7 +46,7 @@ async function radin(serverPlayer, sendMessage=true) {
 }
 
 function goToNextSong(serverPlayer) {
-    serverPlayer.currentSongIndex++;
+    serverPlayer.setCurrentSongIndex(serverPlayer.currentSongIndex + 1);
 
     if (serverPlayer.playlistHasEnded()) {
         return;

@@ -25,14 +25,15 @@ sophi.on('messageCreate', async (message) => {
 
     const normalizedMessage = normalizeMessage(message.content);
 
-    allCommands.forEach((command) => {
+    for (let command of allCommands) {
         const [willExecute, argument] = command.shouldExecute(message, normalizedMessage);
         if (!willExecute) {
-            return;
+            continue;
         }
 
         if (command.requireInVoice && !message.member.voice?.channel) {
-            return message.reply('Você precisa estar conectado à uma sala de voz para fazer isto :s');
+            message.reply('Você precisa estar conectado à uma sala de voz para fazer isto :s');
+            break;
         }
 
         if (!serverPlayers.get(message.guildId)) {
@@ -52,7 +53,7 @@ sophi.on('messageCreate', async (message) => {
                 }
             }
         });
-    });
+    }
 });
 
 function normalizeMessage(messageText) {
@@ -60,6 +61,10 @@ function normalizeMessage(messageText) {
     const separator = /^(\S+)(\s+)?(.+)?$/g;
 
     const match = separator.exec(textWithoutPrefix);
+    if (!match) {
+        console.log('Could not match message ' + messageText);
+        return "";
+    }
 
     if (match[3] === undefined) {
         return match[1].toLowerCase();
