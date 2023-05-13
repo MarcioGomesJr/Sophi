@@ -59,7 +59,7 @@ class ServerPlayer {
             this.checkValidIndex(index);
         }
 
-        this.currentSongIndex = Math.min(index, this.playlist.length - 1);
+        this.currentSongIndex = Math.min(index, self.playlist.length);
 
         if (!this.playlistHasEnded()) {
             this.getCurrentEntry().stopRadin = true;
