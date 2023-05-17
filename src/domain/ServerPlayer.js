@@ -9,6 +9,7 @@ class ServerPlayer {
         this.playlist = [];
         this.currentSongIndex = 0;
         this.idleTimer = null;
+        this.pauseTimer = null;
         this.voiceConnection = null;
         this.audioPlayer = createAudioPlayer({
             behaviors: {

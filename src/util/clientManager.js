@@ -26,12 +26,15 @@ function fillAuthData(spotifyClient) {
                 const token = data.body['access_token'];
                 expiresIn = data.body['expires_in'];
                 credentialGrantedOn = new Date();
+
                 console.log('Token do spotify atualizado:', token);
                 spotifyClient.setAccessToken(token);
+
                 resolve(spotifyClient);
             })
             .catch((error) => {
                 console.log('Erro ao atualizar token do spotify:', error);
+
                 reject(error);
             });
     });
@@ -41,6 +44,7 @@ module.exports = {
     getClient() {
         return discordClient;
     },
+
     getSpotifyClient() {
         if (!spotifyClient) {
             if (spotify_client_id && spotify_client_secret) {
