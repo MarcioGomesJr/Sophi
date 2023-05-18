@@ -72,7 +72,6 @@ class ServerPlayer {
 
     setCurrentSongIndex(index) {
         this.currentSongIndex = Math.max(0, Math.min(this.playlist.length, index));
-        console.log(this.currentSongIndex);
     }
 
     checkValidIndex(index) {
