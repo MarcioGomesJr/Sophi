@@ -1,6 +1,6 @@
 // Comando para manipular a playlist movendo elementos dela pelos indexes
-const Command = require("../domain/Command");
-const { resolveIndex, getTwoIndexesRegex } = require("../util/indexUtil");
+const Command = require('../domain/Command');
+const { resolveIndex, getTwoIndexesRegex } = require('../util/indexUtil');
 const { messageStartsWithCommand } = require('../util/commandUtil');
 
 const move = new Command(
@@ -21,7 +21,9 @@ const move = new Command(
         const playlist = serverPlayer.playlist;
 
         serverPlayer.move(from, to);
-        message.channel.send(`Música ${playlist[to].title} trocada com ${playlist[from].title} uwu`);
+        message.channel.send(
+            `Música ${playlist[to].ytInfo.title} (${to + 1}) trocada com ${playlist[from].ytInfo.title} (${from + 1}) uwu`
+        );
     }
 );
 
