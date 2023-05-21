@@ -81,6 +81,11 @@ async function getYtInfosFromSpotifyTracks(spotifyTracks) {
     const infos = await Promise.all(
         spotifyTracks.map(async (track) => {
             const trackInfo = await searchSpotifyTrack(track);
+
+            if (!trackInfo[0]) {
+                return null;
+            }
+
             return trackInfo[0][0];
         })
     );
@@ -91,7 +96,7 @@ async function getYtInfosFromSpotifyTracks(spotifyTracks) {
 }
 
 async function searchSpotifyTrack(track) {
-    const searchTerm = `${track.artists.map(artist => artist.name).join(',')} ${track.name}`;
+    const searchTerm = `${track.artists.at(0).name} ${track.name}`;
     return searchTrack(searchTerm);
 }
 
