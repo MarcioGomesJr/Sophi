@@ -22,7 +22,7 @@ const move = new Command(
 
         serverPlayer.move(from, to);
         message.channel.send(
-            `Música ${playlist[to].ytInfo.title} (${to + 1}) trocada com ${playlist[from].ytInfo.title} (${from + 1}) uwu`
+            `Música ${playlist[to].ytInfo.title} trocada com ${playlist[from].ytInfo.title} uwu`
         );
     }
 );
