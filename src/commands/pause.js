@@ -1,3 +1,4 @@
+const { AudioPlayerStatus } = require("@discordjs/voice");
 const Command = require("../domain/Command");
 const { messageIsCommand } = require('../util/commandUtil');
 
@@ -11,12 +12,12 @@ const pause = new Command(
 
         if (serverPlayer.notPlayingOrPaused()) {
             message.channel.send('Não tem nada tocando ou pausado owo');
-        } else if (serverPlayer.playerStatus() === 'paused') {
+        } else if (serverPlayer.playerStatus() === AudioPlayerStatus.Paused) {
             clearInterval(serverPlayer.pauseTimer);
 
             audioPlayer.unpause();
             message.channel.send("It's dare U-U");
-        } else if (serverPlayer.playerStatus() === 'playing') {
+        } else if (serverPlayer.playerStatus() === AudioPlayerStatus.Playing) {
             audioPlayer.pause();
             message.channel.send("PAUSO! O-o");
 

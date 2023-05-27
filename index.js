@@ -7,6 +7,9 @@ const allCommands = require('./src/commands/allCommands');
 
 const sophi = getClient();
 
+/**
+ * @type {Map<string, ServerPlayer>}
+ */
 const serverPlayers = new Map();
 
 sophi.on('ready', () => {
@@ -56,6 +59,11 @@ sophi.on('messageCreate', async (message) => {
     }
 });
 
+/**
+ * 
+ * @param {string} messageText
+ * @returns {string}
+ */
 function normalizeMessage(messageText) {
     const textWithoutPrefix = messageText.substring(1);
     const separator = /^(\S+)(\s+)?(.+)?$/g;

@@ -1,3 +1,6 @@
+const { Message } = require('discord.js');
+const ServerPlayer = require('../domain/ServerPlayer');
+
 /*
     Classe para representar comandos do bot. A função shouldExecute recebe a mensagem e o conteúdo normalizado
     (sem o prefixo e tudo em caixa baixa) e retorna true e o texto que será usado como argumento para o comando
@@ -8,9 +11,27 @@
 */
 
 class Command {
+
+    /**
+     * 
+     * @param {(message: Message, normalizedMessage: string) => [boolean, string]} shouldExecute 
+     * @param {(message: Message, argument: string, serverPlayer: ServerPlayer) => void} execute 
+     * @param {boolean} requireInVoice 
+     */
     constructor(shouldExecute, execute, requireInVoice = true) {
+        /**
+         * @type {(message: Message, normalizedMessage: string) => [boolean, string]}
+         */
         this.shouldExecute = shouldExecute;
+        
+        /**
+         * @type {(message: Message, argument: string, serverPlayer: ServerPlayer) => void}
+         */
         this.execute = execute;
+
+        /**
+         * @type {boolean}
+         */
         this.requireInVoice = requireInVoice;
     }
 }

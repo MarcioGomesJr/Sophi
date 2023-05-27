@@ -1,8 +1,13 @@
 const playdl = require('play-dl');
 const ytdl = require('ytdl-core');
-const {getSpotifyClient} = require('../util/clientManager');
+const { getSpotifyClient } = require('../util/clientManager');
 
 // TODO Implementar limitação da duração dos vídeos e pesquisa
+/**
+ * 
+ * @param {string} searchTerm
+ * @returns {Promise<[playdl.YouTubeVideo[] | null, string | null]>}
+ */
 async function searchTrack(searchTerm) {
     if (searchTerm.startsWith('https')) {
         if (/^(spotify:|https:\/\/[a-z]+\.spotify\.com\/)/.test(searchTerm)) {
@@ -34,6 +39,11 @@ async function searchTrack(searchTerm) {
     return [[ytInfo], null];
 }
 
+/**
+ * 
+ * @param {string} spotifyLink
+ * @returns {Promise<[playdl.YouTubeVideo[] | null, string]>}
+ */
 async function searchSpotify(spotifyLink) {
     const spotifyClient = await getSpotifyClient();
     if (!spotifyClient) {
@@ -49,7 +59,7 @@ async function searchSpotify(spotifyLink) {
                 return [null, 'Esse não parece um link válido de uma playlist do spotify a'];
             }
 
-            const tracks = playlistData.body.tracks.items.map(it => it.track);
+            const tracks = playlistData.body.tracks.items.map((it) => it.track);
 
             return getYtInfosFromSpotifyTracks(tracks);
         } else if (spotifyLink.includes('/album')) {
@@ -77,6 +87,11 @@ async function searchSpotify(spotifyLink) {
     }
 }
 
+/**
+ * 
+ * @param {any[]} spotifyTracks
+ * @returns {Promise<[playdl.YouTubeVideo[], string]>}
+ */
 async function getYtInfosFromSpotifyTracks(spotifyTracks) {
     const infos = await Promise.all(
         spotifyTracks.map(async (track) => {
@@ -90,11 +105,16 @@ async function getYtInfosFromSpotifyTracks(spotifyTracks) {
         })
     );
 
-    const foundInfos = infos.filter(it => !!it);
+    const foundInfos = infos.filter((it) => !!it);
 
     return [foundInfos, null];
 }
 
+/**
+ * 
+ * @param {any[]} track
+ * @returns {Promise<[playdl.YouTubeVideo[] | null, string | null]>}
+ */
 async function searchSpotifyTrack(track) {
     const searchTerm = `${track.artists.at(0).name} ${track.name}`;
     return searchTrack(searchTerm);
@@ -115,15 +135,23 @@ async function searchYoutubeLink(searchTerm) {
     }
 }
 
+/**
+ * 
+ * @param {string} playlistUrl
+ * @returns {Promise<[playdl.YouTubeVideo[] | null, string | null]>}
+ */
 async function searchYoutubePlaylist(playlistUrl) {
     if (playdl.yt_validate(playlistUrl) !== 'playlist') {
         return [null, 'Infelizmente só consigo reproduzir links de vídeos ou playlists do YouTube a'];
     }
 
+    /**
+     * @type {playdl.YouTubeVideo[]}
+     */
     let videos = null;
 
     try {
-        const playlistInfo = await playdl.playlist_info(playlistUrl, {incomplete: true});
+        const playlistInfo = await playdl.playlist_info(playlistUrl, { incomplete: true });
         await playlistInfo.fetch();
         videos = playlistInfo.page(1);
     } catch (e) {

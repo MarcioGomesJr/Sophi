@@ -1,5 +1,6 @@
 const Command = require('../domain/Command');
-const { EmbedBuilder } = require('discord.js');
+const ServerPlayer = require('../domain/ServerPlayer');
+const { EmbedBuilder, MessageReaction, User } = require('discord.js');
 const { messageIsCommand } = require('../util/commandUtil');
 
 const queue = new Command(
@@ -32,9 +33,16 @@ const queue = new Command(
             queueMessage.react('⏩'),
         ]);
 
+        /**
+         * 
+         * @param {MessageReaction} reaction
+         * @param {User} user
+         * @returns {void}
+         */
         const filter = (reaction, user) => {
             return user.id !== queueMessage.author.id && '🏠⏪◀️▶️⏩'.includes(reaction.emoji.name);
         };
+
         const collector = queueMessage.createReactionCollector({
             filter,
             time: 300 * 1000,
@@ -42,6 +50,12 @@ const queue = new Command(
             dispose: true,
         });
 
+        /**
+         * 
+         * @param {MessageReaction} reaction
+         * @param {User} user
+         * @returns {void}
+         */
         const changePage = (reaction, user) => {
             const emoji = reaction.emoji.name;
             numberOfPages = Math.ceil(serverPlayer.playlist.length / pageSize);
@@ -73,6 +87,14 @@ const queue = new Command(
     }
 );
 
+/**
+ * 
+ * @param {ServerPlayer} serverPlayer 
+ * @param {number} page 
+ * @param {number} pageSize 
+ * @param {number} numberOfPages 
+ * @returns {string}
+ */
 function buildQueueString(serverPlayer, page, pageSize, numberOfPages) {
     const queueFirstIndex = page * pageSize;
 
@@ -90,6 +112,11 @@ function buildQueueString(serverPlayer, page, pageSize, numberOfPages) {
     );
 }
 
+/**
+ * 
+ * @param {string} nextSongs 
+ * @returns {EmbedBuilder}
+ */
 function buildQueueEmbed(nextSongs) {
     return new EmbedBuilder()
         .setColor(0x1f85de)

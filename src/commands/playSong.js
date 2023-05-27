@@ -5,7 +5,17 @@ const PlaylistEntry = require('../domain/PlaylistEntry');
 const { messageStartsWithCommand } = require('../util/commandUtil');
 const { resolveIndex, getIndexRegex } = require('../util/indexUtil');
 const searchTrack = require('../botfunctions/searchTrack');
+const { Message } = require('discord.js');
+const playdl = require('play-dl');
+const ServerPlayer = require('../domain/ServerPlayer');
 
+/**
+ * 
+ * @param {Message} message
+ * @param {ServerPlayer} serverPlayer
+ * @param {playdl.YouTubeVideo[]} ytInfos
+ * @param {boolean} asNext
+ */
 function playOrAddToPlaylist(message, serverPlayer, ytInfos, asNext = false) {
     const playlistHasEnded = serverPlayer.playlistHasEnded();
 

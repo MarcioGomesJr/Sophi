@@ -1,6 +1,14 @@
 const play = require('play-dl');
 const { joinVoiceChannel, createAudioResource, AudioPlayerStatus, VoiceConnectionStatus } = require('@discordjs/voice');
+const ServerPlayer = require('../domain/ServerPlayer');
+const PlaylistEntry = require('../domain/PlaylistEntry');
 
+/**
+ * 
+ * @param {ServerPlayer} serverPlayer
+ * @param {boolean} sendMessage
+ * @returns {Promise<void>}
+ */
 async function radin(serverPlayer, sendMessage=true) {
     const playlistEntry = serverPlayer.getCurrentEntry();
     if (!playlistEntry) {
@@ -45,6 +53,11 @@ async function radin(serverPlayer, sendMessage=true) {
     });
 }
 
+/**
+ * 
+ * @param {ServerPlayer} serverPlayer
+ * @returns {Promise<void>}
+ */
 function goToNextSong(serverPlayer) {
     serverPlayer.setCurrentSongIndex(serverPlayer.currentSongIndex + 1);
 
@@ -55,6 +68,13 @@ function goToNextSong(serverPlayer) {
     radin(serverPlayer);
 }
 
+/**
+ * 
+ * @param {ServerPlayer} serverPlayer
+ * @param {PlaylistEntry} playlistEntry
+ * @param {boolean} sendMessage
+ * @returns {Promise<boolean>}
+ */
 async function playReq(serverPlayer, playlistEntry, sendMessage) {
     const message = playlistEntry.message;
     const selectedSong = playlistEntry.ytInfo;

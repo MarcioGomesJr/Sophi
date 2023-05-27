@@ -14,10 +14,24 @@ const discordClient = new Client({
     partials: ['CHANNEL', 'MESSAGE'],
 });
 
+/**
+ * @type {SpotifyWebApi}
+ */
 let spotifyClient = null;
+/**
+ * @type {number}
+ */
 let expiresIn = null;
+/**
+ * @type {Date}
+ */
 let credentialGrantedOn = null;
 
+/**
+ * 
+ * @param {SpotifyWebApi} spotifyClient 
+ * @returns {Promise<SpotifyWebApi>}
+ */
 function fillAuthData(spotifyClient) {
     return new Promise((resolve, reject) => {
         spotifyClient
@@ -41,10 +55,18 @@ function fillAuthData(spotifyClient) {
 }
 
 module.exports = {
+    /**
+     * 
+     * @returns {Client}
+     */
     getClient() {
         return discordClient;
     },
 
+    /**
+     * 
+     * @returns {Promise<SpotifyWebApi>}
+     */
     getSpotifyClient() {
         if (!spotifyClient) {
             if (spotify_client_id && spotify_client_secret) {
