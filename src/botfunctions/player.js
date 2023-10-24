@@ -4,15 +4,17 @@ const ServerPlayer = require('../domain/ServerPlayer');
 const PlaylistEntry = require('../domain/PlaylistEntry');
 
 /**
- * 
+ *
  * @param {ServerPlayer} serverPlayer
  * @param {boolean} sendMessage
  * @returns {Promise<void>}
  */
-async function radin(serverPlayer, sendMessage=true) {
+async function radin(serverPlayer, sendMessage = true) {
     const playlistEntry = serverPlayer.getCurrentEntry();
     if (!playlistEntry) {
-        console.log(`Um objeto de PlaylistEntry era esperado! playlistL ${serverPlayer.playlist} index: ${serverPlayer.currentSongIndex}`);
+        console.log(
+            `Um objeto de PlaylistEntry era esperado! playlistL ${serverPlayer.playlist} index: ${serverPlayer.currentSongIndex}`
+        );
         return;
     }
 
@@ -34,14 +36,14 @@ async function radin(serverPlayer, sendMessage=true) {
         clearInterval(timeOutCheckPlaying);
         serverPlayer.idleTimer = setTimeout(() => {
             serverPlayer.voiceConnection.disconnect();
-        }, 900000); // 15 minutes
+        }, 15 * 60 * 1000); // 15 minutes
 
         setTimeout(() => {
             const songCurrentIndex = serverPlayer.playlist.indexOf(playlistEntry);
             if (songCurrentIndex !== -1) {
                 serverPlayer.removeFromPlaylist(songCurrentIndex);
             }
-        }, 10800000); // Three hours
+        }, 4 * 60 * 60 * 1000); // Four hours
 
         serverPlayer.checkPlayingToNoOne(playlistEntry.originalVoiceChannelId, playlistEntry.message);
 
@@ -54,7 +56,7 @@ async function radin(serverPlayer, sendMessage=true) {
 }
 
 /**
- * 
+ *
  * @param {ServerPlayer} serverPlayer
  * @returns {Promise<void>}
  */
@@ -69,7 +71,7 @@ function goToNextSong(serverPlayer) {
 }
 
 /**
- * 
+ *
  * @param {ServerPlayer} serverPlayer
  * @param {PlaylistEntry} playlistEntry
  * @param {boolean} sendMessage
@@ -85,35 +87,41 @@ async function playReq(serverPlayer, playlistEntry, sendMessage) {
 
         const joinOptions = {
             channelId,
-            guildId : message.guild.id,
+            guildId: message.guild.id,
             adapterCreator: message.guild.voiceAdapterCreator,
-        }
+        };
 
-        if (!serverPlayer.voiceConnection || joinOptions.channelId !== serverPlayer.voiceConnection.joinConfig.channelId) {
+        if (
+            !serverPlayer.voiceConnection ||
+            joinOptions.channelId !== serverPlayer.voiceConnection.joinConfig.channelId
+        ) {
             serverPlayer.voiceConnection = joinVoiceChannel(joinOptions);
-        }
-        else if (serverPlayer.voiceConnection.state.status === VoiceConnectionStatus.Disconnected) {
+        } else if (serverPlayer.voiceConnection.state.status === VoiceConnectionStatus.Disconnected) {
             serverPlayer.voiceConnection.rejoin(joinOptions);
         }
 
         const connection = serverPlayer.voiceConnection;
         const audioPlayer = serverPlayer.audioPlayer;
         if (sendMessage) {
-            message.channel.send(`Está tocando: ${selectedSong.title} (${selectedSong.url})\nA pedido de: ${message.member.displayName}`);
+            message.channel.send(
+                `Está tocando: ${selectedSong.title} (${selectedSong.url})\nA pedido de: ${message.member.displayName}`
+            );
         }
 
         let resource = createAudioResource(stream.stream, {
-            inputType: stream.type
+            inputType: stream.type,
         });
 
         audioPlayer.play(resource);
         connection.subscribe(audioPlayer);
 
         return true;
-    } catch(e) {
+    } catch (e) {
         console.log(`Erro ao reproduzir música "${selectedSong.title}": ${e}\n${e.stack}`);
-        message.channel.send(`Não foi possível reproduzir a música (${selectedSong.title})\nProvavelmente tem restrição de idade ou está privado @w@`);
-        
+        message.channel.send(
+            `Não foi possível reproduzir a música (${selectedSong.title})\nProvavelmente tem restrição de idade ou está privado @w@`
+        );
+
         return false;
     }
 }

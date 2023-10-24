@@ -4,7 +4,7 @@ const { getSpotifyClient } = require('../util/clientManager');
 
 // TODO Implementar limitação da duração dos vídeos e pesquisa
 /**
- * 
+ *
  * @param {string} searchTerm
  * @returns {Promise<[playdl.YouTubeVideo[] | null, string | null]>}
  */
@@ -26,7 +26,7 @@ async function searchTrack(searchTerm) {
         return searchYoutubeLink(searchTerm);
     }
 
-    const [ytInfo] = await playdl.search(searchTerm, {source: {youtube: 'video'}, limit: 1, fuzzy: true});
+    const [ytInfo] = await playdl.search(searchTerm, { source: { youtube: 'video' }, limit: 1, fuzzy: true });
 
     if (!ytInfo) {
         return [null, 'Infelizmente sua pesquisa não foi encontrada =('];
@@ -40,7 +40,7 @@ async function searchTrack(searchTerm) {
 }
 
 /**
- * 
+ *
  * @param {string} spotifyLink
  * @returns {Promise<[playdl.YouTubeVideo[] | null, string]>}
  */
@@ -88,7 +88,7 @@ async function searchSpotify(spotifyLink) {
 }
 
 /**
- * 
+ *
  * @param {any[]} spotifyTracks
  * @returns {Promise<[playdl.YouTubeVideo[], string]>}
  */
@@ -111,7 +111,7 @@ async function getYtInfosFromSpotifyTracks(spotifyTracks) {
 }
 
 /**
- * 
+ *
  * @param {any[]} track
  * @returns {Promise<[playdl.YouTubeVideo[] | null, string | null]>}
  */
@@ -131,12 +131,15 @@ async function searchYoutubeLink(searchTerm) {
         return [[ytInfo], null];
     } catch (e) {
         console.log(`Erro ao buscar informação da música ${searchTerm}\n`, e);
-        return [null, `Não consegui obter informações do vídeo ${searchTerm} ~w~\nProvavelmetne é privada ou com restrição de idade a`];
+        return [
+            null,
+            `Não consegui obter informações do vídeo ${searchTerm} ~w~\nProvavelmente é privada ou com restrição de idade a`,
+        ];
     }
 }
 
 /**
- * 
+ *
  * @param {string} playlistUrl
  * @returns {Promise<[playdl.YouTubeVideo[] | null, string | null]>}
  */

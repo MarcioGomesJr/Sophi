@@ -34,7 +34,7 @@ const queue = new Command(
         ]);
 
         /**
-         * 
+         *
          * @param {MessageReaction} reaction
          * @param {User} user
          * @returns {void}
@@ -45,13 +45,13 @@ const queue = new Command(
 
         const collector = queueMessage.createReactionCollector({
             filter,
-            time: 300 * 1000,
+            time: 15 * 60 * 1000,
             max: 1000,
             dispose: true,
         });
 
         /**
-         * 
+         *
          * @param {MessageReaction} reaction
          * @param {User} user
          * @returns {void}
@@ -88,33 +88,31 @@ const queue = new Command(
 );
 
 /**
- * 
- * @param {ServerPlayer} serverPlayer 
- * @param {number} page 
- * @param {number} pageSize 
- * @param {number} numberOfPages 
+ *
+ * @param {ServerPlayer} serverPlayer
+ * @param {number} page
+ * @param {number} pageSize
+ * @param {number} numberOfPages
  * @returns {string}
  */
 function buildQueueString(serverPlayer, page, pageSize, numberOfPages) {
     const queueFirstIndex = page * pageSize;
 
     return (
-        serverPlayer.playlist
-            .slice(queueFirstIndex, queueFirstIndex + pageSize)
-            .reduce((acc, playlistEntry, index) => {
-                index += queueFirstIndex;
+        serverPlayer.playlist.slice(queueFirstIndex, queueFirstIndex + pageSize).reduce((acc, playlistEntry, index) => {
+            index += queueFirstIndex;
 
-                const ytInfo = playlistEntry.ytInfo;
-                const currentSongInfo = index === serverPlayer.currentSongIndex ? ' **-> Tocando atualmente :3**' : '';
+            const ytInfo = playlistEntry.ytInfo;
+            const currentSongInfo = index === serverPlayer.currentSongIndex ? ' **-> Tocando atualmente :3**' : '';
 
-                return acc + `${index + 1} - ${ytInfo.title} ${currentSongInfo}\n${ytInfo.url}\n`;
-            }, '') + `\n**${page + 1}/${numberOfPages}**`
+            return acc + `${index + 1} - ${ytInfo.title} ${currentSongInfo}\n${ytInfo.url}\n`;
+        }, '') + `\n**${page + 1}/${numberOfPages}**`
     );
 }
 
 /**
- * 
- * @param {string} nextSongs 
+ *
+ * @param {string} nextSongs
  * @returns {EmbedBuilder}
  */
 function buildQueueEmbed(nextSongs) {
