@@ -115,6 +115,12 @@ async function playReq(serverPlayer, playlistEntry, sendMessage) {
         audioPlayer.play(resource);
         connection.subscribe(audioPlayer);
 
+        console.log(
+            `${new Date()} tocando ${playReq.ytInfo.title} a pedido de ${message.author.displayName} no servidor ${
+                message.guild.name
+            }`
+        );
+
         return true;
     } catch (e) {
         console.log(`Erro ao reproduzir música "${selectedSong.title}": ${e}\n${e.stack}`);
