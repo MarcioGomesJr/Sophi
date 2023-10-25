@@ -26,17 +26,29 @@ async function searchTrack(searchTerm) {
         return searchYoutubeLink(searchTerm);
     }
 
-    const [ytInfo] = await playdl.search(searchTerm, { source: { youtube: 'video' }, limit: 1, fuzzy: true });
-
-    if (!ytInfo) {
-        return [null, 'Infelizmente sua pesquisa não foi encontrada =('];
-    }
+    const [[ytInfo]] = await searchYoutube(searchTerm, 1);
 
     if (ytInfo.discretionAdvised) {
         return [null, `Não foi possível reproduzir o vídeo (${ytInfo.title})\nPois ele tem restrição de idade @w@`];
     }
 
     return [[ytInfo], null];
+}
+
+/**
+ *
+ * @param {string} searchTerm
+ * @param {number} limit
+ * @returns {Promise<[playdl.YouTubeVideo[] | null, string | null]>}
+ */
+async function searchYoutube(searchTerm, limit) {
+    const ytInfos = await playdl.search(searchTerm, { source: { youtube: 'video' }, limit, fuzzy: true });
+
+    if (ytInfos.length === 0) {
+        return [null, 'Infelizmente sua pesquisa não foi encontrada =('];
+    }
+
+    return [ytInfos, null];
 }
 
 /**
@@ -168,4 +180,4 @@ async function searchYoutubePlaylist(playlistUrl) {
     return [videos, null];
 }
 
-module.exports = searchTrack;
+module.exports = { searchTrack, searchYoutube };

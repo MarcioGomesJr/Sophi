@@ -15,21 +15,21 @@ const discordClient = new Client({
 });
 
 /**
- * @type {SpotifyWebApi}
+ * @type {SpotifyWebApi?}
  */
 let spotifyClient = null;
 /**
- * @type {number}
+ * @type {number?}
  */
 let expiresIn = null;
 /**
- * @type {Date}
+ * @type {Date?}
  */
 let credentialGrantedOn = null;
 
 /**
- * 
- * @param {SpotifyWebApi} spotifyClient 
+ *
+ * @param {SpotifyWebApi} spotifyClient
  * @returns {Promise<SpotifyWebApi>}
  */
 function fillAuthData(spotifyClient) {
@@ -56,7 +56,7 @@ function fillAuthData(spotifyClient) {
 
 module.exports = {
     /**
-     * 
+     *
      * @returns {Client}
      */
     getClient() {
@@ -64,7 +64,7 @@ module.exports = {
     },
 
     /**
-     * 
+     *
      * @returns {Promise<SpotifyWebApi>}
      */
     getSpotifyClient() {
