@@ -40,6 +40,7 @@ sophi.on('messageCreate', async (message) => {
         }
 
         if (!serverPlayers.get(message.guildId)) {
+            console.log(`${new Date()} novo servidor: ${message.guild.name} dono: ${message.guild.ownerId}`)
             serverPlayers.set(message.guildId, new ServerPlayer());
         }
 

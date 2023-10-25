@@ -2,7 +2,6 @@ const playdl = require('play-dl');
 const ytdl = require('ytdl-core');
 const { getSpotifyClient } = require('../util/clientManager');
 
-// TODO Implementar limitação da duração dos vídeos e pesquisa
 /**
  *
  * @param {string} searchTerm

@@ -116,7 +116,7 @@ async function playReq(serverPlayer, playlistEntry, sendMessage) {
         connection.subscribe(audioPlayer);
 
         console.log(
-            `${new Date()} tocando ${playReq.ytInfo.title} a pedido de ${message.author.displayName} no servidor ${
+            `${new Date()} tocando ${selectedSong.title} a pedido de ${message.author.displayName} no servidor ${
                 message.guild.name
             }`
         );

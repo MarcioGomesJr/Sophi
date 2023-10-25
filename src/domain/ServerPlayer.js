@@ -66,6 +66,10 @@ class ServerPlayer {
      * @returns {void}
      */
     addToPlaylist(playlistEntry, asNext = false) {
+        if (playlistEntry.ytInfo.durationInSec > 20 * 60) {
+            throw new SophiError('Aaaaaaa muito longooooo! Duração máxima de 20 minutos uwu');
+        }
+
         if (asNext) {
             this.playlist.splice(this.currentSongIndex + 1, 0, playlistEntry);
         } else {
