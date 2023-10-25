@@ -30,11 +30,17 @@ const search = new Command(
 
         collector.on('collect', (m) => {
             const index = Number.parseInt(m.content.replace(/\D/gi, ''));
-            if (!index || index < 1 || index > options.length) {
+            if (Number.isNaN(index) || index < 1 || index > options.length) {
                 return m.reply(`Por favor, responda com um número entre 1 e ${options.length}`);
             }
 
-            playOrAddToPlaylist(message, serverPlayer, [options[index - 1]]);
+            const selected = options[index - 1];
+
+            if (selected.discretionAdvised) {
+                return m.reply('Esse vídeo tem restrição de idade @w@. Escolha outro a');
+            }
+
+            playOrAddToPlaylist(message, serverPlayer, [selected]);
 
             collector.stop('chosen');
         });
@@ -55,7 +61,7 @@ const search = new Command(
  */
 function buildOptionsEmbed(options) {
     const optionsString = options.reduce((acc, ytInfo, index) => {
-        return acc + `\n**${1 + index})** ${ytInfo.title} **do canal** ${ytInfo.channel.name}`;
+        return acc + `\n**${1 + index})** ${ytInfo.title} **do canal** ${ytInfo.channel.name}\n`;
     }, '');
 
     return new EmbedBuilder()
