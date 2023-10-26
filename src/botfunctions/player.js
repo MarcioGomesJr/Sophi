@@ -116,9 +116,7 @@ async function playReq(serverPlayer, playlistEntry, sendMessage) {
         connection.subscribe(audioPlayer);
 
         console.log(
-            `${new Date()} tocando ${selectedSong.title} a pedido de ${message.author.displayName} no servidor ${
-                message.guild.name
-            }`
+            `Tocando '${selectedSong.title}' a pedido de '${message.author.username}'(${message.author.id}) no servidor '${message.guild.name}'(${message.guildId})`
         );
 
         return true;

@@ -40,8 +40,10 @@ sophi.on('messageCreate', async (message) => {
         }
 
         if (!serverPlayers.get(message.guildId)) {
-            console.log(`${new Date()} novo servidor: ${message.guild.name} dono: ${message.guild.ownerId}`)
             serverPlayers.set(message.guildId, new ServerPlayer());
+            console.log(
+                `Novo servidor: '${message.guild.name}'(${message.guildId}), total: ${serverPlayers.size}, dono: ${message.guild.ownerId}`
+            );
         }
 
         const serverPlayer = serverPlayers.get(message.guildId);
@@ -61,7 +63,7 @@ sophi.on('messageCreate', async (message) => {
 });
 
 /**
- * 
+ *
  * @param {string} messageText
  * @returns {string}
  */
@@ -72,7 +74,7 @@ function normalizeMessage(messageText) {
     const match = separator.exec(textWithoutPrefix);
     if (!match) {
         console.log('Could not match message ' + messageText);
-        return "";
+        return '';
     }
 
     if (match[3] === undefined) {

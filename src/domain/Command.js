@@ -25,7 +25,7 @@ class Command {
         this.shouldExecute = shouldExecute;
         
         /**
-         * @type {(message: Message, argument: string, serverPlayer: ServerPlayer) => void}
+         * @type {(message: Message, argument: string, serverPlayer: ServerPlayer) => Promise<any>}
          */
         this.execute = execute;
 
