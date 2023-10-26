@@ -13,7 +13,7 @@ async function radin(serverPlayer, sendMessage = true) {
     const playlistEntry = serverPlayer.getCurrentEntry();
     if (!playlistEntry) {
         console.log(
-            `Um objeto de PlaylistEntry era esperado! playlistL ${serverPlayer.playlist} index: ${serverPlayer.currentSongIndex}`
+            `Um objeto de PlaylistEntry era esperado! playlist ${serverPlayer.playlist.length} index: ${serverPlayer.currentSongIndex}`
         );
         return;
     }
