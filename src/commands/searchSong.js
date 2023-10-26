@@ -3,7 +3,7 @@ const Command = require('../domain/Command');
 const { YouTubeVideo } = require('play-dl');
 const { searchYoutube } = require('../botfunctions/searchTrack');
 const { messageStartsWithCommand } = require('../util/commandUtil');
-const { EmbedBuilder, MessageCollector, User } = require('discord.js');
+const { EmbedBuilder, MessageCollector, User, Message } = require('discord.js');
 const playOrAddToPlaylist = require('../botfunctions/playOrAddToPlaylist');
 
 const search = new Command(
@@ -23,6 +23,11 @@ const search = new Command(
             embeds: [optionsEmbed],
         });
 
+        /**
+         *
+         * @param {Message} m
+         * @returns {boolean}
+         */
         const filter = (m) => {
             return m.author.id === message.author.id && m.reference?.messageId === optionsMessage.id;
         };

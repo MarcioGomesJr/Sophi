@@ -60,22 +60,28 @@ const queue = new Command(
             const emoji = reaction.emoji.name;
             numberOfPages = Math.ceil(serverPlayer.playlist.length / pageSize);
 
-            if (emoji === '🏠') {
-                page = Math.floor(serverPlayer.currentSongIndex / pageSize);
-            } else if (emoji === '⏪') {
-                page = 0;
-            } else if (emoji === '▶️') {
-                if (page + 1 === numberOfPages) {
-                    return;
-                }
-                page++;
-            } else if (emoji === '◀️') {
-                if (page === 0) {
-                    return;
-                }
-                page--;
-            } else {
-                page = numberOfPages - 1;
+            switch (emoji) {
+                case '🏠':
+                    page = Math.floor(serverPlayer.currentSongIndex / pageSize);
+                    break;
+                case '⏪':
+                    page = 0;
+                    break;
+                case '▶️':
+                    if (page + 1 >= numberOfPages) {
+                        return;
+                    }
+                    page++;
+                    break;
+                case '◀️':
+                    if (page <= 0) {
+                        return;
+                    }
+                    page--;
+                    break;
+                case '⏩':
+                    page = numberOfPages - 1;
+                    break;
             }
 
             const newQueue = buildQueueString(serverPlayer, page, pageSize, numberOfPages);

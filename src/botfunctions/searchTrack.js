@@ -2,6 +2,8 @@ const playdl = require('play-dl');
 const ytdl = require('ytdl-core');
 const { getSpotifyClient } = require('../util/clientManager');
 
+const playlistLimit = 50;
+
 /**
  *
  * @param {string} searchTerm
@@ -64,7 +66,7 @@ async function searchSpotify(spotifyLink) {
         spotifyLink = spotifyLink.replace(/&.+$/gi, '');
         const id = spotifyLink.split('/').pop();
         if (spotifyLink.includes('/playlist')) {
-            const playlistData = await spotifyClient.getPlaylistTracks(id, { limit: 50, offset: 0 });
+            const playlistData = await spotifyClient.getPlaylistTracks(id, { limit: playlistLimit, offset: 0 });
 
             if (!playlistData) {
                 return [null, 'Esse não parece um link válido de uma playlist do spotify a'];
@@ -74,7 +76,7 @@ async function searchSpotify(spotifyLink) {
 
             return getYtInfosFromSpotifyTracks(tracks);
         } else if (spotifyLink.includes('/album')) {
-            const albumData = await spotifyClient.getAlbumTracks(id, { limit: 50, offset: 0 });
+            const albumData = await spotifyClient.getAlbumTracks(id, { limit: playlistLimit, offset: 0 });
 
             if (!albumData) {
                 return [null, 'Esse não parece um link válido de um álbum spotify a'];
@@ -98,6 +100,7 @@ async function searchSpotify(spotifyLink) {
     }
 }
 
+// TODO o ideal seria isso ser lazy...
 /**
  *
  * @param {any[]} spotifyTracks
@@ -105,7 +108,7 @@ async function searchSpotify(spotifyLink) {
  */
 async function getYtInfosFromSpotifyTracks(spotifyTracks) {
     const infos = await Promise.all(
-        spotifyTracks.map(async (track) => {
+        spotifyTracks.slice(0, playlistLimit).map(async (track) => {
             const trackInfo = await searchSpotifyTrack(track);
 
             if (!trackInfo[0]) {
@@ -176,7 +179,7 @@ async function searchYoutubePlaylist(playlistUrl) {
         return [null, 'Infelizmente ocorreu um erro ao ler os vídeos dessa playlist do YouTube aa'];
     }
 
-    return [videos, null];
+    return [videos.slice(0, playlistLimit), null];
 }
 
-module.exports = { searchTrack, searchYoutube };
+module.exports = { searchTrack, searchYoutube, playlistLimit };

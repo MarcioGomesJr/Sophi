@@ -18,7 +18,7 @@ sophi.on('ready', () => {
 });
 
 sophi.on('messageCreate', async (message) => {
-    if (message.author.bot || message.content[0] !== '-' || message.content.length < 2) {
+    if (message.author.bot || message.content[0] !== '+' || message.content.length < 2) {
         return;
     }
 
@@ -39,7 +39,7 @@ sophi.on('messageCreate', async (message) => {
             break;
         }
 
-        if (!serverPlayers.get(message.guildId)) {
+        if (!serverPlayers.has(message.guildId)) {
             serverPlayers.set(message.guildId, new ServerPlayer());
             console.log(
                 `Novo servidor: '${message.guild.name}'(${message.guildId}), total: ${serverPlayers.size}, dono: ${message.guild.ownerId}`
@@ -73,7 +73,7 @@ function normalizeMessage(messageText) {
 
     const match = separator.exec(textWithoutPrefix);
     if (!match) {
-        console.log('Could not match message ' + messageText);
+        console.log('Mensagem não corresponde a nenhum comando ' + messageText);
         return '';
     }
 
