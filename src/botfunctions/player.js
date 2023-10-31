@@ -19,7 +19,6 @@ async function radin(serverPlayer, sendMessage = true) {
     }
 
     const sucesso = await playReq(serverPlayer, playlistEntry, sendMessage);
-    clearTimeout(serverPlayer.idleTimer);
 
     if (!sucesso) {
         goToNextSong(serverPlayer);
@@ -34,6 +33,8 @@ async function radin(serverPlayer, sendMessage = true) {
 
     serverPlayer.audioPlayer.once(AudioPlayerStatus.Idle, (oldState, newState) => {
         clearInterval(timeOutCheckPlaying);
+        clearTimeout(serverPlayer.idleTimer);
+
         serverPlayer.idleTimer = setTimeout(() => {
             serverPlayer.voiceConnection.disconnect();
         }, 15 * 60 * 1000); // 15 minutes
