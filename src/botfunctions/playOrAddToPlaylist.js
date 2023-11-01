@@ -11,8 +11,9 @@ const { playlistLimit: limit } = require('../botfunctions/searchTrack');
  * @param {ServerPlayer} serverPlayer
  * @param {YouTubeVideo[]} ytInfos
  * @param {boolean} asNext
+ * @returns {Promise<any>}
  */
-function playOrAddToPlaylist(message, serverPlayer, ytInfos, asNext = false) {
+async function playOrAddToPlaylist(message, serverPlayer, ytInfos, asNext = false) {
     const playlistHasEnded = serverPlayer.playlistHasEnded();
     const trimed = trimPlaylist(serverPlayer, ytInfos, limit, playlistHasEnded);
 
@@ -32,7 +33,6 @@ function playOrAddToPlaylist(message, serverPlayer, ytInfos, asNext = false) {
         message.reply(`Sua música (${ytInfos[0].title}) foi adicionada ${asNext ? 'como a próxima' : ''} na queue e.e`);
     }
 
-
     ytInfos.forEach((ytInfo) => {
         if (ytInfo.durationInSec > 60 * 60) {
             return message.reply(`Aaaaaaaaaa o vídeo ${ytInfo.title} tem mais de uma hora! Muito loooongo uwu`);
@@ -44,7 +44,7 @@ function playOrAddToPlaylist(message, serverPlayer, ytInfos, asNext = false) {
     });
 
     if (playlistHasEnded) {
-        radin(serverPlayer);
+        await radin(serverPlayer);
     }
 
     console.log(`Adicionados ${ytInfos.length} itens à playlist`);

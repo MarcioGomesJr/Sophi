@@ -17,7 +17,7 @@ const play = new Command(
             return message.reply(error);
         }
 
-        playOrAddToPlaylist(message, serverPlayer, ytInfos);
+        await playOrAddToPlaylist(message, serverPlayer, ytInfos);
     }
 );
 
@@ -33,7 +33,7 @@ const playNext = new Command(
             return message.reply(error);
         }
 
-        playOrAddToPlaylist(message, serverPlayer, ytInfos, true);
+        await playOrAddToPlaylist(message, serverPlayer, ytInfos, true);
     }
 );
 
@@ -52,8 +52,8 @@ const playAgain = new Command(
         serverPlayer.checkValidIndex(index);
         const playlistEntry = serverPlayer.playlist[index];
 
-        playOrAddToPlaylist(message, serverPlayer, [playlistEntry.ytInfo]);
+        await playOrAddToPlaylist(message, serverPlayer, [playlistEntry.ytInfo]);
     }
 );
 
-module.exports = [play, playNext, playAgain];
+module.exports = { play, playNext, playAgain };
