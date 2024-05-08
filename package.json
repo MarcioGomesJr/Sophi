@@ -13,6 +13,7 @@
     "@discordjs/voice": "0.16.0",
     "async-mutex": "^0.4.0",
     "discord.js": "14.11.0",
+    "ffmpeg-static": "5.2.0",
     "libsodium-wrappers": "0.7.11",
     "play-dl": "1.9.6",
     "spotify-web-api-node": "5.0.2",
