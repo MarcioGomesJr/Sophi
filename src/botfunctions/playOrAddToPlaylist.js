@@ -34,8 +34,8 @@ async function playOrAddToPlaylist(message, serverPlayer, ytInfos, asNext = fals
     }
 
     ytInfos.forEach((ytInfo) => {
-        if (ytInfo.durationInSec > 60 * 60) {
-            return message.reply(`Aaaaaaaaaa o vídeo ${ytInfo.title} tem mais de uma hora! Muito loooongo uwu`);
+        if (ytInfo.durationInSec > 120 * 60) {
+            return message.reply(`Aaaaaaaaaa o vídeo ${ytInfo.title} tem mais de duas horas! Muito loooongo uwu`);
         }
 
         const playlistEntry = new PlaylistEntry(message, ytInfo);
@@ -54,15 +54,15 @@ async function playOrAddToPlaylist(message, serverPlayer, ytInfos, asNext = fals
  *
  * @param {ServerPlayer} serverPlayer
  * @param {YouTubeVideo[]} ytInfos
- * @param {number} limite
+ * @param {number} limit
  * @param {boolean} playlistHasEnded
  * @returns {boolean}
  */
-function trimPlaylist(serverPlayer, ytInfos, limite, playlistHasEnded) {
+function trimPlaylist(serverPlayer, ytInfos, limit, playlistHasEnded) {
     const toBePlayed = serverPlayer.playlist.length - (serverPlayer.currentSongIndex + (playlistHasEnded ? 0 : 1));
 
-    if (toBePlayed + ytInfos.length > limite) {
-        const toAdd = Math.max(limite - toBePlayed, 0);
+    if (toBePlayed + ytInfos.length > limit) {
+        const toAdd = Math.max(limit - toBePlayed, 0);
         ytInfos.splice(toAdd, ytInfos.length - toAdd);
         return true;
     }

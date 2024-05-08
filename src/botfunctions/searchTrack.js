@@ -2,7 +2,7 @@ const playdl = require('play-dl');
 const ytdl = require('ytdl-core');
 const { getSpotifyClient } = require('../util/clientManager');
 
-const playlistLimit = 50;
+const playlistLimit = 100;
 
 /**
  *
@@ -144,7 +144,7 @@ async function searchYoutubeLink(searchTerm) {
         };
         return [[ytInfo], null];
     } catch (e) {
-        console.log(`Erro ao buscar informação da música ${searchTerm}\n`, e);
+        console.log(`Erro ao buscar informação da música ${searchTerm}`, e);
         return [
             null,
             `Não consegui obter informações do vídeo ${searchTerm} ~w~\nProvavelmente é privada ou com restrição de idade a`,

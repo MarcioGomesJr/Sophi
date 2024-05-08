@@ -16,9 +16,9 @@
     "libsodium-wrappers": "0.7.11",
     "play-dl": "1.9.6",
     "spotify-web-api-node": "5.0.2",
-    "ytdl-core": "4.11.4"
+    "ytdl-core": "4.11.5"
   },
   "devDependencies": {
-    "nodemon": "^2.0.20"
+    "nodemon": "^3.1.0"
   }
 }
