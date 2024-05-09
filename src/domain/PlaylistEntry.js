@@ -25,9 +25,9 @@ class PlaylistEntry {
         this.stopRadin = false;
 
         /**
-         * @type {string}
+         * @type {string | undefined}
          */
-        this.originalVoiceChannelId = message.member.voice.channel.id;
+        this.originalVoiceChannelId = message.member?.voice.channel?.id;
     }
 
     /**
@@ -35,7 +35,10 @@ class PlaylistEntry {
      * @returns {PlaylistEntry}
      */
     clone() {
-        return new PlaylistEntry(this.message, this.ytInfo);
+        const cloned = new PlaylistEntry(this.message, this.ytInfo);
+        cloned.originalVoiceChannelId = this.originalVoiceChannelId;
+
+        return cloned;
     }
 }
 

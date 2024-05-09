@@ -32,26 +32,21 @@ let credentialGrantedOn = null;
  * @param {SpotifyWebApi} spotifyClient
  * @returns {Promise<SpotifyWebApi>}
  */
-function fillAuthData(spotifyClient) {
-    return new Promise((resolve, reject) => {
-        spotifyClient
-            .clientCredentialsGrant()
-            .then((data) => {
-                const token = data.body['access_token'];
-                expiresIn = data.body['expires_in'];
-                credentialGrantedOn = new Date();
+async function fillAuthData(spotifyClient) {
+    try {
+        const data = await spotifyClient.clientCredentialsGrant();
+        const { access_token: token, expires_in } = data.body;
+        expiresIn = expires_in;
+        credentialGrantedOn = new Date();
 
-                console.log('Token do spotify atualizado:', token);
-                spotifyClient.setAccessToken(token);
+        console.log('Token do spotify atualizado:', token);
+        spotifyClient.setAccessToken(token);
+        return spotifyClient;
+    } catch (error) {
+        console.log('Erro ao atualizar token do spotify:', error);
 
-                resolve(spotifyClient);
-            })
-            .catch((error) => {
-                console.log('Erro ao atualizar token do spotify:', error);
-
-                reject(error);
-            });
-    });
+        throw error;
+    }
 }
 
 module.exports = {
@@ -65,7 +60,7 @@ module.exports = {
 
     /**
      *
-     * @returns {Promise<SpotifyWebApi>}
+     * @returns {Promise<SpotifyWebApi?>}
      */
     getSpotifyClient() {
         if (!spotifyClient) {

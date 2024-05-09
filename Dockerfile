@@ -6,9 +6,6 @@ COPY ./src ./src
 COPY index.js .
 COPY package.json .
 
-RUN npm i --exclude=dev
-
-RUN apt-get update
-RUN apt-get install -y ffmpeg
+RUN npm i --save-exact --exclude=dev
 
 CMD ["node", "index.js"]

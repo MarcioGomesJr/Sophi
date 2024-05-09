@@ -25,17 +25,17 @@ class ServerPlayer {
         this.currentSongIndex = 0;
 
         /**
-         * @type {NodeJS.Timeout | null}
+         * @type {NodeJS.Timeout?}
          */
         this.idleTimer = null;
 
         /**
-         * @type {NodeJS.Timeout | null}
+         * @type {NodeJS.Timeout?}
          */
         this.pauseTimer = null;
 
         /**
-         * @type {VoiceConnection | null}
+         * @type {VoiceConnection?}
          */
         this.voiceConnection = null;
 

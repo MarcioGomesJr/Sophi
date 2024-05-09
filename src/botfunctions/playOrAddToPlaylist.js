@@ -33,15 +33,16 @@ async function playOrAddToPlaylist(message, serverPlayer, ytInfos, asNext = fals
         message.reply(`Sua música (${ytInfos[0].title}) foi adicionada ${asNext ? 'como a próxima' : ''} na queue e.e`);
     }
 
-    ytInfos.forEach((ytInfo) => {
+    for (const ytInfo of ytInfo) {
         if (ytInfo.durationInSec > 120 * 60) {
-            return message.reply(`Aaaaaaaaaa o vídeo ${ytInfo.title} tem mais de duas horas! Muito loooongo uwu`);
+            message.reply(`Aaaaaaaaaa o vídeo ${ytInfo.title} tem mais de duas horas! Muito loooongo uwu`);
+            continue;
         }
 
         const playlistEntry = new PlaylistEntry(message, ytInfo);
 
         serverPlayer.addToPlaylist(playlistEntry, asNext);
-    });
+    }
 
     if (playlistHasEnded) {
         await radin(serverPlayer);
