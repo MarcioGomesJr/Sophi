@@ -14,6 +14,14 @@ const { playlistLimit: limit } = require('../botfunctions/searchTrack');
  * @returns {Promise<any>}
  */
 async function playOrAddToPlaylist(message, serverPlayer, ytInfos, asNext = false) {
+    ytInfos = ytInfos.filter((ytInfo) => {
+        if (ytInfo.durationInSec > 120 * 60) {
+            message.reply(`Aaaaaaaaaa o vídeo ${ytInfo.title} tem mais de duas horas! Muito loooongo uwu`);
+            return false;
+        }
+        return true;
+    });
+
     const playlistHasEnded = serverPlayer.playlistHasEnded();
     const trimed = trimPlaylist(serverPlayer, ytInfos, limit, playlistHasEnded);
 
@@ -34,13 +42,7 @@ async function playOrAddToPlaylist(message, serverPlayer, ytInfos, asNext = fals
     }
 
     for (const ytInfo of ytInfo) {
-        if (ytInfo.durationInSec > 120 * 60) {
-            message.reply(`Aaaaaaaaaa o vídeo ${ytInfo.title} tem mais de duas horas! Muito loooongo uwu`);
-            continue;
-        }
-
         const playlistEntry = new PlaylistEntry(message, ytInfo);
-
         serverPlayer.addToPlaylist(playlistEntry, asNext);
     }
 

@@ -130,7 +130,7 @@ async function getYtInfosFromSpotifyTracks(spotifyTracks) {
  * @returns {Promise<[playdl.YouTubeVideo[] | null, string | null]>}
  */
 async function searchSpotifyTrack(track) {
-    const searchTerm = `${track.artists.at(0).name} ${track.name}`;
+    const searchTerm = `${track.artists[0].name} ${track.name}`;
     return searchTrack(searchTerm);
 }
 
