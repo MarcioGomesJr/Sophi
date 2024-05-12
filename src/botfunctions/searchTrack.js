@@ -27,13 +27,17 @@ async function searchTrack(searchTerm) {
         return searchYoutubeLink(searchTerm);
     }
 
-    const [[ytInfo]] = await searchYoutube(searchTerm, 1);
+    const [ytInfo, error] = await searchYoutube(searchTerm, 1);
 
-    if (ytInfo.discretionAdvised) {
+    if (error) {
+        return [null, error];
+    }
+
+    if (ytInfo[0].discretionAdvised) {
         return [null, `Não foi possível reproduzir o vídeo (${ytInfo.title})\nPois ele tem restrição de idade @w@`];
     }
 
-    return [[ytInfo], null];
+    return [ytInfo, null];
 }
 
 /**
@@ -141,6 +145,11 @@ async function searchYoutubeLink(searchTerm) {
         const ytInfo = {
             title: basicInfo.videoDetails.title,
             url: searchTerm,
+            channel: {
+                name: basicInfo.videoDetails.author.name,
+            },
+            durationInSec: basicInfo.videoDetails.lengthSeconds,
+            durationRaw: formatDuration(basicInfo.videoDetails.lengthSeconds),
         };
         return [[ytInfo], null];
     } catch (e) {
@@ -149,6 +158,22 @@ async function searchYoutubeLink(searchTerm) {
             null,
             `Não consegui obter informações do vídeo ${searchTerm} ~w~\nProvavelmente é privada ou com restrição de idade a`,
         ];
+    }
+}
+
+function formatDuration(seconds) {
+    const hours = Math.floor(seconds / 3600);
+    const minutes = Math.floor((seconds % 3600) / 60);
+    const remainingSeconds = seconds % 60;
+
+    const formattedMinutes = minutes.toString().padStart(2, '0');
+    const formattedSeconds = remainingSeconds.toString().padStart(2, '0');
+
+    if (hours > 0) {
+        const formattedHours = hours.toString().padStart(2, '0');
+        return `${formattedHours}:${formattedMinutes}:${formattedSeconds}`;
+    } else {
+        return `${formattedMinutes}:${formattedSeconds}`;
     }
 }
 

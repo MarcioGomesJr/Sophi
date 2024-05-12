@@ -13,7 +13,8 @@ async function radin(serverPlayer, sendMessage = true) {
     const playlistEntry = serverPlayer.getCurrentEntry();
     if (!playlistEntry) {
         console.log(
-            `Um objeto de PlaylistEntry era esperado! playlist ${serverPlayer.playlist.length} index: ${serverPlayer.currentSongIndex}`
+            `Um objeto de PlaylistEntry era esperado! playlist ${serverPlayer.playlist.length}` +
+                ` index: ${serverPlayer.currentSongIndex}`
         );
         return;
     }
@@ -27,7 +28,9 @@ async function radin(serverPlayer, sendMessage = true) {
 
     const timeOutCheckPlaying = setInterval(() => {
         if (serverPlayer.notPlayingOrPaused()) {
-            serverPlayer.skipToSong(serverPlayer.currentSongIndex, false);
+            console.log('Tentando iniciar reprodução novamente');
+            serverPlayer.skipToSong(serverPlayer.currentSongIndex);
+            radin(serverPlayer, false);
         }
     }, 5000); // 5 seconds
 
@@ -105,7 +108,8 @@ async function playReq(serverPlayer, playlistEntry, sendMessage) {
         const audioPlayer = serverPlayer.audioPlayer;
         if (sendMessage) {
             message.channel.send(
-                `Está tocando: ${selectedSong.title} (${selectedSong.url})\nA pedido de: ${message.member.displayName}`
+                `Está tocando: ${selectedSong.title} (${selectedSong.url}) (${selectedSong.durationRaw})\n` +
+                    `A pedido de: ${message.member.displayName}`
             );
         }
 
@@ -117,14 +121,16 @@ async function playReq(serverPlayer, playlistEntry, sendMessage) {
         connection.subscribe(audioPlayer);
 
         console.log(
-            `Tocando '${selectedSong.title}' a pedido de '${message.author.username}'(${message.author.id}) no servidor '${message.guild.name}'(${message.guildId})`
+            `Tocando '${selectedSong.title}' (${selectedSong.durationRaw}) a pedido de '${message.author.username}'` +
+                `(${message.author.id}) no servidor '${message.guild.name}'(${message.guildId})`
         );
 
         return true;
     } catch (e) {
         console.log(`Erro ao reproduzir música "${selectedSong.title}": ${e}\n${e.stack}`);
         message.channel.send(
-            `Não foi possível reproduzir a música (${selectedSong.title})\nProvavelmente tem restrição de idade ou está privado @w@`
+            `Não foi possível reproduzir a música (${selectedSong.title})\n` +
+                `Provavelmente tem restrição de idade ou está privado @w@`
         );
 
         return false;

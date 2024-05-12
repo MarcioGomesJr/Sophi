@@ -38,13 +38,16 @@ async function playOrAddToPlaylist(message, serverPlayer, ytInfos, asNext = fals
             `Um total de (${ytInfos.length}) músicas foram adicionadas ${asNext ? 'como as próximas' : ''} na queue e.e`
         );
     } else if (!playlistHasEnded) {
-        message.reply(`Sua música (${ytInfos[0].title}) foi adicionada ${asNext ? 'como a próxima' : ''} na queue e.e`);
+        message.reply(
+            `Sua música '${ytInfos[0].title}' (${ytInfos[0].durationRaw}) foi adicionada` +
+                `${asNext ? 'como a próxima' : ''} na queue e.e`
+        );
     }
 
-    for (const ytInfo of ytInfo) {
+    ytInfos.forEach((ytInfo) => {
         const playlistEntry = new PlaylistEntry(message, ytInfo);
         serverPlayer.addToPlaylist(playlistEntry, asNext);
-    }
+    });
 
     if (playlistHasEnded) {
         await radin(serverPlayer);

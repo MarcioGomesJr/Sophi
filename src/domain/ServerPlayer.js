@@ -1,4 +1,3 @@
-const radin = require('../botfunctions/player');
 const {
     createAudioPlayer,
     NoSubscriberBehavior,
@@ -60,7 +59,7 @@ class ServerPlayer {
     }
 
     /**
-     * 
+     *
      * @param {PlaylistEntry} playlistEntry
      * @param {boolean} asNext
      * @returns {void}
@@ -74,26 +73,27 @@ class ServerPlayer {
     }
 
     /**
-     * 
+     *
      * @param {number} index
      * @returns {PlaylistEntry}
      */
     removeFromPlaylist(index) {
         this.checkValidIndex(index);
-        const removed = this.playlist.splice(index, 1);
+        const [removed] = this.playlist.splice(index, 1);
 
         if (index <= this.currentSongIndex) {
             this.currentSongIndex--;
             if (index === this.currentSongIndex + 1) {
-                this.skipToSong();
+                // Going to next entry, skipping the current one
+                this.audioPlayer.stop();
             }
         }
-
-        return removed[0];
+ 
+        return removed;
     }
 
     /**
-     * 
+     *
      * @returns {PlaylistEntry}
      */
     getCurrentEntry() {
@@ -101,7 +101,7 @@ class ServerPlayer {
     }
 
     /**
-     * 
+     *
      * @returns {boolean}
      */
     playlistHasEnded() {
@@ -109,15 +109,14 @@ class ServerPlayer {
     }
 
     /**
-     * 
-     * @param {number} index
-     * @param {boolean} sendMessage
-     * @returns {void}
+     *
+     * @param {number?} index
+     * @returns {boolean} If the radin needs to be called
      */
-    skipToSong(index = -1, sendMessage = true) {
-        if (index === -1) {
+    skipToSong(index = null) {
+        if (index === null) {
             if (this.playlistHasEnded()) {
-                return;
+                return false;
             }
             index = this.currentSongIndex + 1;
         } else {
@@ -132,11 +131,11 @@ class ServerPlayer {
             this.setCurrentSongIndex(index);
         }
 
-        radin(this, sendMessage);
+        return true;
     }
 
     /**
-     * 
+     *
      * @param {number} index
      * @returns {void}
      */
@@ -145,18 +144,20 @@ class ServerPlayer {
     }
 
     /**
-     * 
+     *
      * @param {number} index
      * @returns {void}
      */
     checkValidIndex(index) {
         if (index < 0 || index >= this.playlist.length) {
-            throw new SophiError(`Índice ${index + 1} inválido! Veja a playlist com -q para saber quais podem ser usados :P`);
+            throw new SophiError(
+                `Índice ${index + 1} inválido! Veja a playlist com -q para saber quais podem ser usados :P`
+            );
         }
     }
 
     /**
-     * 
+     *
      * @param {number} from
      * @param {number} to
      * @returns {void}
@@ -170,7 +171,9 @@ class ServerPlayer {
             throw new SophiError(`Índice ${to + 1} inválido! Deve ser maior ou igual a um :P`);
         }
         if (to === this.currentSongIndex) {
-            throw new SophiError(`Índice ${to + 1} inválido! Não se pode mover para a música tocando agora. Mova para next e dê skip :P`);
+            throw new SophiError(
+                `Índice ${to + 1} inválido! Não se pode mover para a música tocando agora. Mova para next e dê skip :P`
+            );
         }
         if (to > this.playlist.length) {
             throw new SophiError(`Índice ${to + 1} inválido! Deve ser menor que um após o último da playlist :P`);
@@ -181,7 +184,7 @@ class ServerPlayer {
 
         if (to === this.playlist.length) {
             const playlistEntry = this.removeFromPlaylist(from);
-            this.addToPlaylist(playlistEntry.clone());
+            this.addToPlaylist(playlistEntry);
         } else {
             const temp = this.playlist[from];
             this.playlist[from] = this.playlist[to];
@@ -190,7 +193,7 @@ class ServerPlayer {
     }
 
     /**
-     * 
+     *
      * @returns {AudioPlayerStatus}
      */
     playerStatus() {
@@ -198,12 +201,11 @@ class ServerPlayer {
     }
 
     /**
-     * 
+     *
      * @returns {boolean}
      */
     notPlayingOrPaused() {
-        return this.playerStatus() != AudioPlayerStatus.Paused 
-            && this.playerStatus() != AudioPlayerStatus.Playing;
+        return this.playerStatus() != AudioPlayerStatus.Paused && this.playerStatus() != AudioPlayerStatus.Playing;
     }
 
     clearPlaylist() {
@@ -228,7 +230,7 @@ class ServerPlayer {
     }
 
     /**
-     * 
+     *
      * @param {string} channelId
      * @param {Message} message
      * @returns {void}

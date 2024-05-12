@@ -111,7 +111,7 @@ function buildQueueString(serverPlayer, page, pageSize, numberOfPages) {
             const ytInfo = playlistEntry.ytInfo;
             const currentSongInfo = index === serverPlayer.currentSongIndex ? ' **-> Tocando atualmente :3**' : '';
 
-            return acc + `${index + 1} - ${ytInfo.title} ${currentSongInfo}\n${ytInfo.url}\n`;
+            return acc + `${index + 1} - ${ytInfo.title} (${ytInfo.durationRaw})${currentSongInfo}\n${ytInfo.url}\n`;
         }, '') + `\n**${page + 1}/${numberOfPages}**`
     );
 }

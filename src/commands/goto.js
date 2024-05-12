@@ -1,4 +1,5 @@
 // Comando para pular para um index da playlist
+const radin = require("../botfunctions/player");
 const Command = require("../domain/Command");
 const { messageStartsWithCommand } = require('../util/commandUtil');
 const { resolveIndex, getIndexRegex } = require("../util/indexUtil");
@@ -16,7 +17,9 @@ const skip = new Command(
 
         const index = resolveIndex(result[1], serverPlayer);
 
-        serverPlayer.skipToSong(index);
+        if (serverPlayer.skipToSong(index)) {
+            radin(serverPlayer);
+        }
     }
 );
 

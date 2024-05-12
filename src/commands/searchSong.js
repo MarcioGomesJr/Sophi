@@ -36,11 +36,13 @@ const searchNext = new Command(
  * @returns {Promise<void>}
  */
 async function searchSong(message, argument, serverPlayer, asNext) {
-    const [options, error] = await searchYoutube(argument, 5);
+    let [options, error] = await searchYoutube(argument, 10);
 
     if (error) {
         return message.reply(error);
     }
+
+    options = options.filter((ytInfo) => !ytInfo.discretionAdvised).slice(0, 5);
 
     const optionsEmbed = buildOptionsEmbed(options);
     const optionsMessage = await message.reply({
@@ -64,10 +66,6 @@ async function searchSong(message, argument, serverPlayer, asNext) {
         }
 
         const selected = options[index - 1];
-
-        if (selected.discretionAdvised) {
-            return m.reply('Esse vídeo tem restrição de idade @w@. Escolha outro a');
-        }
 
         playOrAddToPlaylist(message, serverPlayer, [selected], asNext);
 
