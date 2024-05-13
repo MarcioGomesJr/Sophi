@@ -43,8 +43,8 @@ sophi.on('messageCreate', async (message) => {
             serverPlayers.set(message.guildId, new ServerPlayer());
             const owner = await message.guild.fetchOwner();
             console.log(
-                `Novo servidor: '${message.guild.name}'(${message.guildId}), total: ${serverPlayers.size}` +
-                    `, dono: '${owner.displayName}'(${owner.id})`
+                `Novo servidor: '${message.guild.name}'(${message.guildId}), total: ${serverPlayers.size}.` +
+                    ` Dono: '${owner.user.username}'(${owner.id})`
             );
         }
 
