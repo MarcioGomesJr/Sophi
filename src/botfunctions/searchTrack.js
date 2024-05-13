@@ -1,6 +1,7 @@
 const playdl = require('play-dl');
 const ytdl = require('ytdl-core');
 const { getSpotifyClient } = require('../util/clientManager');
+const { formatDuration } = require('../util/formatUtil');
 
 const playlistLimit = 100;
 
@@ -138,19 +139,28 @@ async function searchSpotifyTrack(track) {
     return searchTrack(searchTerm);
 }
 
+/**
+ *
+ * @param {string} searchTerm
+ * @returns {Promise<[playdl.YouTubeVideo[], string]>}
+ */
 async function searchYoutubeLink(searchTerm) {
     try {
         searchTerm = searchTerm.replace(/&.+$/gi, '');
+
         const basicInfo = await ytdl.getBasicInfo(searchTerm);
+        const durationInSec = Number.parseInt(basicInfo.videoDetails.lengthSeconds);
+
         const ytInfo = {
             title: basicInfo.videoDetails.title,
             url: searchTerm,
             channel: {
                 name: basicInfo.videoDetails.author.name,
             },
-            durationInSec: basicInfo.videoDetails.lengthSeconds,
-            durationRaw: formatDuration(basicInfo.videoDetails.lengthSeconds),
+            durationInSec,
+            durationRaw: formatDuration(durationInSec),
         };
+
         return [[ytInfo], null];
     } catch (e) {
         console.log(`Erro ao buscar informação da música ${searchTerm}`, e);
@@ -158,22 +168,6 @@ async function searchYoutubeLink(searchTerm) {
             null,
             `Não consegui obter informações do vídeo ${searchTerm} ~w~\nProvavelmente é privada ou com restrição de idade a`,
         ];
-    }
-}
-
-function formatDuration(seconds) {
-    const hours = Math.floor(seconds / 3600);
-    const minutes = Math.floor((seconds % 3600) / 60);
-    const remainingSeconds = seconds % 60;
-
-    const formattedMinutes = minutes.toString().padStart(2, '0');
-    const formattedSeconds = remainingSeconds.toString().padStart(2, '0');
-
-    if (hours > 0) {
-        const formattedHours = hours.toString().padStart(2, '0');
-        return `${formattedHours}:${formattedMinutes}:${formattedSeconds}`;
-    } else {
-        return `${formattedMinutes}:${formattedSeconds}`;
     }
 }
 

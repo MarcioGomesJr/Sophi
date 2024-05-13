@@ -87,7 +87,9 @@ async function searchSong(message, argument, serverPlayer, asNext) {
  */
 function buildOptionsEmbed(options) {
     const optionsString = options.reduce((acc, ytInfo, index) => {
-        return acc + `\n**${1 + index})** ${ytInfo.title} **do canal** ${ytInfo.channel.name}\n`;
+        return (
+            acc + `\n**${1 + index})** ${ytInfo.title} (${ytInfo.durationRaw}) **do canal** ${ytInfo.channel.name}\n`
+        );
     }, '');
 
     return new EmbedBuilder()
