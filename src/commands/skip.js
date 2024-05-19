@@ -1,13 +1,13 @@
-const radin = require("../botfunctions/player");
-const Command = require("../domain/Command");
+const radin = require('../botfunctions/player');
+const Command = require('../domain/Command');
 const { messageIsCommand } = require('../util/commandUtil');
 
 const skip = new Command(
-    (message, normalizedMessage) => {
+    (_message, normalizedMessage) => {
         return messageIsCommand(normalizedMessage, ['skip', 'next', 's', 'n']);
     },
 
-    async (message, argument, serverPlayer) => {
+    async (message, _argument, serverPlayer) => {
         if (serverPlayer.playlistHasEnded()) {
             return message.channel.send('Não tem nada tocando ou pausado uwu');
         }

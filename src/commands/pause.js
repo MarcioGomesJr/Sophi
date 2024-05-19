@@ -1,13 +1,13 @@
-const { AudioPlayerStatus } = require("@discordjs/voice");
-const Command = require("../domain/Command");
+const { AudioPlayerStatus } = require('@discordjs/voice');
+const Command = require('../domain/Command');
 const { messageIsCommand } = require('../util/commandUtil');
 
 const pause = new Command(
-    (message, normalizedMessage) => {
+    (_message, normalizedMessage) => {
         return messageIsCommand(normalizedMessage, ['pause', 'play', 'p']);
     },
 
-    async (message, argument, serverPlayer) => {
+    async (message, _argument, serverPlayer) => {
         const audioPlayer = serverPlayer.audioPlayer;
 
         if (serverPlayer.notPlayingOrPaused()) {
@@ -19,7 +19,7 @@ const pause = new Command(
             message.channel.send("It's dare U-U");
         } else if (serverPlayer.playerStatus() === AudioPlayerStatus.Playing) {
             audioPlayer.pause();
-            message.channel.send("PAUSO! O-o");
+            message.channel.send('PAUSO! O-o');
 
             serverPlayer.pauseTimer = setTimeout(() => {
                 serverPlayer.clearPlaylist();

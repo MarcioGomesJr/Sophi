@@ -11,19 +11,18 @@ const ServerPlayer = require('../domain/ServerPlayer');
 */
 
 class Command {
-
     /**
-     * 
-     * @param {(message: Message, normalizedMessage: string) => [boolean, string]} shouldExecute 
-     * @param {(message: Message, argument: string, serverPlayer: ServerPlayer) => void} execute 
-     * @param {boolean} requireInVoice 
+     *
+     * @param {(message: Message, normalizedMessage: string) => [boolean, string]} shouldExecute
+     * @param {(message: Message, argument: string, serverPlayer: ServerPlayer) => Promise<void>} execute
+     * @param {boolean} requireInVoice
      */
     constructor(shouldExecute, execute, requireInVoice = true) {
         /**
          * @type {(message: Message, normalizedMessage: string) => [boolean, string]}
          */
         this.shouldExecute = shouldExecute;
-        
+
         /**
          * @type {(message: Message, argument: string, serverPlayer: ServerPlayer) => Promise<any>}
          */

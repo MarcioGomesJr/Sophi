@@ -27,7 +27,8 @@ async function playOrAddToPlaylist(message, serverPlayer, ytInfos, asNext = fals
 
     if (trimed) {
         if (ytInfos.length === 0) {
-            return message.reply(`A playlist já está cheia! O Tamanho máximo é de ${limit} @w@`);
+            message.reply(`A playlist já está cheia! O Tamanho máximo é de ${limit} @w@`);
+            return;
         } else {
             message.reply(`A playlist está bem grande! Limitei seu pedido à ${ytInfos.length} musica(s) @w@`);
         }

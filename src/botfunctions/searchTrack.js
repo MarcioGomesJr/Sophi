@@ -97,7 +97,7 @@ async function searchSpotify(spotifyLink) {
                 return [null, 'Esse não parece um link válido do spotify a'];
             }
 
-            return searchSpotifyTrack(trackData.body, spotifyClient);
+            return searchSpotifyTrack(trackData.body);
         }
     } catch (e) {
         console.log('Erro ao buscar música pelo link do spotify: ' + spotifyLink, e);
@@ -135,7 +135,11 @@ async function getYtInfosFromSpotifyTracks(spotifyTracks) {
  * @returns {Promise<[playdl.YouTubeVideo[] | null, string | null]>}
  */
 async function searchSpotifyTrack(track) {
-    const searchTerm = `${track.artists[0].name} ${track.name}`;
+    const artists = track.artists
+        .slice(0, 2)
+        .map((artist) => artist.name)
+        .join(', ');
+    const searchTerm = `${artists} ${track.name}`;
     return searchTrack(searchTerm);
 }
 

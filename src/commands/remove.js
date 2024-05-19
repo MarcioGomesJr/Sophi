@@ -1,6 +1,6 @@
 // Comando para o bot remover uma música específica da playlist por index
-const Command = require("../domain/Command");
-const { resolveIndex, getIndexRegex } = require("../util/indexUtil");
+const Command = require('../domain/Command');
+const { resolveIndex, getIndexRegex } = require('../util/indexUtil');
 const { messageStartsWithCommand } = require('../util/commandUtil');
 
 const remove = new Command(
@@ -11,7 +11,8 @@ const remove = new Command(
     async (message, argument, serverPlayer) => {
         const result = getIndexRegex().exec(argument);
         if (!result) {
-            return message.reply('Uso errado do comando! Deve ser -r 3 por exemplo ou -clear para remover todas :v');
+            message.reply('Uso errado do comando! Deve ser -r 3 por exemplo ou -clear para remover todas :v');
+            return;
         }
 
         const index = resolveIndex(result[1], serverPlayer);

@@ -4,11 +4,11 @@ const { EmbedBuilder, MessageReaction, User } = require('discord.js');
 const { messageIsCommand } = require('../util/commandUtil');
 
 const queue = new Command(
-    (message, normalizedMessage) => {
+    (_message, normalizedMessage) => {
         return messageIsCommand(normalizedMessage, ['queue', 'q']);
     },
 
-    async (message, argument, serverPlayer) => {
+    async (message, _argument, serverPlayer) => {
         if (serverPlayer.playlist.length < 1) {
             message.channel.send('Não tem nada tocando ou na playlist =(');
             return;
@@ -24,7 +24,6 @@ const queue = new Command(
             embeds: [playlistMessage],
         });
 
-        // TODO validar se assim está sempre indo na ordem certa
         await Promise.all([
             queueMessage.react('🏠'),
             queueMessage.react('⏪'),
@@ -53,10 +52,10 @@ const queue = new Command(
         /**
          *
          * @param {MessageReaction} reaction
-         * @param {User} user
+         * @param {User} _user
          * @returns {void}
          */
-        const changePage = (reaction, user) => {
+        const changePage = (reaction, _user) => {
             const emoji = reaction.emoji.name;
             numberOfPages = Math.ceil(serverPlayer.playlist.length / pageSize);
 

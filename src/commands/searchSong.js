@@ -3,12 +3,12 @@ const Command = require('../domain/Command');
 const { YouTubeVideo } = require('play-dl');
 const { searchYoutube } = require('../botfunctions/searchTrack');
 const { messageStartsWithCommand } = require('../util/commandUtil');
-const { EmbedBuilder, MessageCollector, User, Message } = require('discord.js');
+const { EmbedBuilder, MessageCollector, Message } = require('discord.js');
 const playOrAddToPlaylist = require('../botfunctions/playOrAddToPlaylist');
 const ServerPlayer = require('../domain/ServerPlayer');
 
 const search = new Command(
-    (message, normalizedMessage) => {
+    (_message, normalizedMessage) => {
         return messageStartsWithCommand(normalizedMessage, ['search', 'find', 'f']);
     },
 
@@ -18,7 +18,7 @@ const search = new Command(
 );
 
 const searchNext = new Command(
-    (message, normalizedMessage) => {
+    (_message, normalizedMessage) => {
         return messageStartsWithCommand(normalizedMessage, ['searchNext', 'findNext', 'fn']);
     },
 
@@ -39,7 +39,8 @@ async function searchSong(message, argument, serverPlayer, asNext) {
     let [options, error] = await searchYoutube(argument, 10);
 
     if (error) {
-        return message.reply(error);
+        message.reply(error);
+        return;
     }
 
     options = options.filter((ytInfo) => !ytInfo.discretionAdvised).slice(0, 5);

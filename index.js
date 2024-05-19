@@ -23,7 +23,8 @@ sophi.on('messageCreate', async (message) => {
     }
 
     if (!message.member) {
-        return message.channel.send('Sinto muito, só funciono em servidores! ewe');
+        message.channel.send('Sinto muito, só funciono em servidores! ewe');
+        return;
     }
 
     const normalizedMessage = normalizeMessage(message.content);

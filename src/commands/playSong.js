@@ -6,7 +6,7 @@ const { searchTrack } = require('../botfunctions/searchTrack');
 const playOrAddToPlaylist = require('../botfunctions/playOrAddToPlaylist');
 
 const play = new Command(
-    (message, normalizedMessage) => {
+    (_message, normalizedMessage) => {
         return messageStartsWithCommand(normalizedMessage, ['play', 'p']);
     },
 
@@ -14,7 +14,8 @@ const play = new Command(
         const [ytInfos, error] = await searchTrack(argument);
 
         if (error) {
-            return message.reply(error);
+            message.reply(error);
+            return;
         }
 
         await playOrAddToPlaylist(message, serverPlayer, ytInfos);
@@ -22,7 +23,7 @@ const play = new Command(
 );
 
 const playNext = new Command(
-    (message, normalizedMessage) => {
+    (_message, normalizedMessage) => {
         return messageStartsWithCommand(normalizedMessage, ['playnext', 'pn']);
     },
 
@@ -30,7 +31,8 @@ const playNext = new Command(
         const [ytInfos, error] = await searchTrack(argument);
 
         if (error) {
-            return message.reply(error);
+            message.reply(error);
+            return;
         }
 
         await playOrAddToPlaylist(message, serverPlayer, ytInfos, true);
@@ -38,14 +40,15 @@ const playNext = new Command(
 );
 
 const playAgain = new Command(
-    (message, normalizedMessage) => {
+    (_message, normalizedMessage) => {
         return messageStartsWithCommand(normalizedMessage, ['playagain', 'pa']);
     },
 
     async (message, argument, serverPlayer) => {
         const result = getIndexRegex().exec(argument);
         if (!result) {
-            return message.reply('Uso errado do comando! Deve ser -pa 3 por exemplo :v');
+            message.reply('Uso errado do comando! Deve ser -pa 3 por exemplo :v');
+            return;
         }
 
         const index = resolveIndex(result[1], serverPlayer);

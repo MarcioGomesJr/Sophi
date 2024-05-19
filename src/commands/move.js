@@ -4,7 +4,7 @@ const { resolveIndex, getTwoIndexesRegex } = require('../util/indexUtil');
 const { messageStartsWithCommand } = require('../util/commandUtil');
 
 const move = new Command(
-    (message, normalizedMessage) => {
+    (_message, normalizedMessage) => {
         return messageStartsWithCommand(normalizedMessage, ['move', 'mv']);
     },
 
@@ -12,7 +12,8 @@ const move = new Command(
         const indexes = getTwoIndexesRegex().exec(argument);
 
         if (!indexes) {
-            return message.reply('Uso errado do comando! Deve ser -mv 3 2 por exemplo :v');
+            message.reply('Uso errado do comando! Deve ser -mv 3 2 por exemplo :v');
+            return;
         }
 
         const from = resolveIndex(indexes[1], serverPlayer);
@@ -21,9 +22,7 @@ const move = new Command(
         const playlist = serverPlayer.playlist;
 
         serverPlayer.move(from, to);
-        message.channel.send(
-            `Música "${playlist[to].ytInfo.title}" trocada com "${playlist[from].ytInfo.title}" uwu`
-        );
+        message.channel.send(`Música "${playlist[to].ytInfo.title}" trocada com "${playlist[from].ytInfo.title}" uwu`);
     }
 );
 

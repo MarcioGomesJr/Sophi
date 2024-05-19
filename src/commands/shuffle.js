@@ -1,13 +1,13 @@
 // Comando para embaralhar o restante da playlist
-const Command = require("../domain/Command");
+const Command = require('../domain/Command');
 const { messageIsCommand } = require('../util/commandUtil');
 
 const shuffle = new Command(
-    (message, normalizedMessage) => {
+    (_message, normalizedMessage) => {
         return messageIsCommand(normalizedMessage, ['shuffle', 'random']);
     },
 
-    async (message, argument, serverPlayer) => {
+    async (message, _argument, serverPlayer) => {
         serverPlayer.shufflePlaylist();
         message.channel.send('Tudo bem misturado 🌀');
     }
