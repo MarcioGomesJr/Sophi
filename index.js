@@ -7,6 +7,8 @@ const logger = require('./src/util/logger');
 const token = require('./src/token').token;
 const allCommands = require('./src/commands/allCommands');
 
+logger.info(`Starting up bot. Version: ${version}.`);
+
 const sophi = getClient();
 
 /**
@@ -16,7 +18,7 @@ const serverPlayers = new Map();
 
 sophi.on('ready', () => {
     sophi.user.setActivity('indie babe uwu', { type: 'LISTENING' });
-    logger.info(`Logged in as ${sophi.user.tag}! Version: ${version}`);
+    logger.info(`Logged in as ${sophi.user.tag}!`);
 });
 
 sophi.on('messageCreate', async (message) => {
@@ -60,7 +62,7 @@ sophi.on('messageCreate', async (message) => {
                 if (e instanceof SophiError) {
                     message.reply(e.message);
                 } else {
-                    logger.error(`Erro ao processar a mensagem: "${normalizedMessage}": ${e}\n${e.stack}`);
+                    logger.error(`Erro ao processar a mensagem: "${normalizedMessage}"`, e);
                 }
             }
         });
@@ -78,7 +80,7 @@ function normalizeMessage(messageText) {
 
     const match = separator.exec(textWithoutPrefix);
     if (!match) {
-        logger.info('Mensagem não corresponde a nenhum comando ' + messageText);
+        logger.info(`Mensagem não corresponde a nenhum comando ${messageText}`);
         return '';
     }
 

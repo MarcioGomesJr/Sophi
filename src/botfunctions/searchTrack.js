@@ -101,7 +101,7 @@ async function searchSpotify(spotifyLink) {
             return searchSpotifyTrack(trackData.body);
         }
     } catch (e) {
-        logger.error('Erro ao buscar música pelo link do spotify: ' + spotifyLink, e);
+        logger.error(`Erro ao buscar música pelo link do spotify: ${spotifyLink}`, e);
         return [null, 'Esse não parece ser um link válido do spotify =x'];
     }
 }
@@ -168,7 +168,7 @@ async function searchYoutubeLink(searchTerm) {
 
         return [[ytInfo], null];
     } catch (e) {
-        logger.error(`Erro ao buscar informação da música ${searchTerm}`, e);
+        logger.error(`Erro ao buscar informação da música "${searchTerm}"`, e);
         return [
             null,
             `Não consegui obter informações do vídeo ${searchTerm} ~w~\nProvavelmente é privada ou com restrição de idade a`,
@@ -196,7 +196,7 @@ async function searchYoutubePlaylist(playlistUrl) {
         await playlistInfo.fetch();
         videos = playlistInfo.page(1);
     } catch (e) {
-        logger.error(`Erro ao obter músicas da playlist: "${playlistUrl}": ${e}\n${e.stack}`);
+        logger.error(`Erro ao obter músicas da playlist: "${playlistUrl}"`, e);
     }
 
     if (!videos) {

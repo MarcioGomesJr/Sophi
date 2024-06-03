@@ -119,7 +119,7 @@ async function playReq(serverPlayer, playlistEntry, sendMessage) {
 
         return true;
     } catch (e) {
-        logger.error(`Erro ao reproduzir música "${selectedSong.title}": ${e}\n${e.stack}`);
+        logger.error(`Erro ao reproduzir música "${selectedSong.title}"`, e);
         message.channel.send(
             `Não foi possível reproduzir a música (${selectedSong.title})\n` +
                 `Provavelmente tem restrição de idade ou está privado @w@`

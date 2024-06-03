@@ -40,11 +40,11 @@ async function fillAuthData(spotifyClient) {
         expiresIn = expires_in;
         credentialGrantedOn = new Date();
 
-        logger.info('Token do spotify atualizado:', token);
+        logger.info('Token do spotify atualizado');
         spotifyClient.setAccessToken(token);
         return spotifyClient;
     } catch (error) {
-        logger.error('Erro ao atualizar token do spotify:', error);
+        logger.error('Erro ao atualizar token do spotify', error);
 
         throw error;
     }
