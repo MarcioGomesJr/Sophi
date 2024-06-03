@@ -4,6 +4,7 @@ const ServerPlayer = require('../domain/ServerPlayer');
 const PlaylistEntry = require('../domain/PlaylistEntry');
 const radin = require('../botfunctions/player');
 const { playlistLimit: limit } = require('../botfunctions/searchTrack');
+const logger = require('../util/logger');
 
 /**
  *
@@ -54,7 +55,7 @@ async function playOrAddToPlaylist(message, serverPlayer, ytInfos, asNext = fals
         await radin(serverPlayer);
     }
 
-    console.log(`Adicionados ${ytInfos.length} itens à playlist`);
+    logger.info(`Adicionados ${ytInfos.length} itens à playlist`);
 }
 
 /**

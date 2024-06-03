@@ -1,6 +1,7 @@
 const { Client, GatewayIntentBits } = require('discord.js');
 const { spotify_client_id, spotify_client_secret } = require('../token');
 const SpotifyWebApi = require('spotify-web-api-node');
+const logger = require('../util/logger');
 
 const discordClient = new Client({
     intents: [
@@ -39,11 +40,11 @@ async function fillAuthData(spotifyClient) {
         expiresIn = expires_in;
         credentialGrantedOn = new Date();
 
-        console.log('Token do spotify atualizado:', token);
+        logger.info('Token do spotify atualizado:', token);
         spotifyClient.setAccessToken(token);
         return spotifyClient;
     } catch (error) {
-        console.log('Erro ao atualizar token do spotify:', error);
+        logger.error('Erro ao atualizar token do spotify:', error);
 
         throw error;
     }

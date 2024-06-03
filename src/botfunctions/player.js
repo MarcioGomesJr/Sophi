@@ -2,6 +2,7 @@ const play = require('play-dl');
 const { joinVoiceChannel, createAudioResource, AudioPlayerStatus, VoiceConnectionStatus } = require('@discordjs/voice');
 const ServerPlayer = require('../domain/ServerPlayer');
 const PlaylistEntry = require('../domain/PlaylistEntry');
+const logger = require('../util/logger');
 
 /**
  *
@@ -12,7 +13,7 @@ const PlaylistEntry = require('../domain/PlaylistEntry');
 async function radin(serverPlayer, sendMessage = true) {
     const playlistEntry = serverPlayer.getCurrentEntry();
     if (!playlistEntry) {
-        console.log(
+        logger.warn(
             `Um objeto de PlaylistEntry era esperado! playlist ${serverPlayer.playlist.length}` +
                 ` index: ${serverPlayer.currentSongIndex}`
         );
@@ -111,14 +112,14 @@ async function playReq(serverPlayer, playlistEntry, sendMessage) {
         audioPlayer.play(resource);
         connection.subscribe(audioPlayer);
 
-        console.log(
+        logger.info(
             `Tocando '${selectedSong.title}' (${selectedSong.durationRaw}) a pedido de '${message.author.username}'` +
                 `(${message.author.id}) no servidor '${message.guild.name}'(${message.guildId})`
         );
 
         return true;
     } catch (e) {
-        console.log(`Erro ao reproduzir música "${selectedSong.title}": ${e}\n${e.stack}`);
+        logger.error(`Erro ao reproduzir música "${selectedSong.title}": ${e}\n${e.stack}`);
         message.channel.send(
             `Não foi possível reproduzir a música (${selectedSong.title})\n` +
                 `Provavelmente tem restrição de idade ou está privado @w@`

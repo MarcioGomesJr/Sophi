@@ -5,3 +5,4 @@ node_modules/
 /src/token.js
 /src/config.json
 debug.log
+sophi.log

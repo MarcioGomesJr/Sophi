@@ -2,6 +2,7 @@ const playdl = require('play-dl');
 const ytdl = require('ytdl-core');
 const { getSpotifyClient } = require('../util/clientManager');
 const { formatDuration } = require('../util/formatUtil');
+const logger = require('../util/logger');
 
 const playlistLimit = 100;
 
@@ -100,7 +101,7 @@ async function searchSpotify(spotifyLink) {
             return searchSpotifyTrack(trackData.body);
         }
     } catch (e) {
-        console.log('Erro ao buscar música pelo link do spotify: ' + spotifyLink, e);
+        logger.error('Erro ao buscar música pelo link do spotify: ' + spotifyLink, e);
         return [null, 'Esse não parece ser um link válido do spotify =x'];
     }
 }
@@ -167,7 +168,7 @@ async function searchYoutubeLink(searchTerm) {
 
         return [[ytInfo], null];
     } catch (e) {
-        console.log(`Erro ao buscar informação da música ${searchTerm}`, e);
+        logger.error(`Erro ao buscar informação da música ${searchTerm}`, e);
         return [
             null,
             `Não consegui obter informações do vídeo ${searchTerm} ~w~\nProvavelmente é privada ou com restrição de idade a`,
@@ -195,7 +196,7 @@ async function searchYoutubePlaylist(playlistUrl) {
         await playlistInfo.fetch();
         videos = playlistInfo.page(1);
     } catch (e) {
-        console.log(`Erro ao obter músicas da playlist: "${playlistUrl}": ${e}\n${e.stack}`);
+        logger.error(`Erro ao obter músicas da playlist: "${playlistUrl}": ${e}\n${e.stack}`);
     }
 
     if (!videos) {

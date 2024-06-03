@@ -10,6 +10,7 @@ const { withTimeout, Mutex } = require('async-mutex');
 const { getClient } = require('../util/clientManager');
 const SophiError = require('../domain/SophiError');
 const PlaylistEntry = require('./PlaylistEntry');
+const logger = require('../util/logger');
 
 class ServerPlayer {
     constructor() {
@@ -238,7 +239,7 @@ class ServerPlayer {
     checkPlayingToNoOne(channelId, message) {
         const channel = getClient().channels.cache.get(channelId);
         if (!channel) {
-            console.log(`Canal de id ${channelId} não encontrado no chache do bot...`);
+            logger.warn(`Canal de id ${channelId} não encontrado no chache do bot...`);
             return;
         }
 
