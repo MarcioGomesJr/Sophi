@@ -1,6 +1,7 @@
 const { getClient } = require('./src/util/clientManager');
 const ServerPlayer = require('./src/domain/ServerPlayer');
 const SophiError = require('./src/domain/SophiError');
+const version = require('./package.json').version;
 const logger = require('./src/util/logger');
 
 const token = require('./src/token').token;
@@ -15,7 +16,7 @@ const serverPlayers = new Map();
 
 sophi.on('ready', () => {
     sophi.user.setActivity('indie babe uwu', { type: 'LISTENING' });
-    logger.info(`Logged in as ${sophi.user.tag}!`);
+    logger.info(`Logged in as ${sophi.user.tag}! Version: ${version}`);
 });
 
 sophi.on('messageCreate', async (message) => {
