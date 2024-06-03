@@ -26,18 +26,9 @@ async function radin(serverPlayer, sendMessage = true) {
         return;
     }
 
-    const timeOutCheckPlaying = setInterval(() => {
-        if (serverPlayer.notPlayingOrPaused()) {
-            console.log('Tentando iniciar reprodução novamente');
-            serverPlayer.skipToSong(serverPlayer.currentSongIndex);
-            radin(serverPlayer, false);
-        }
-    }, 5000); // 5 seconds
+    clearTimeout(serverPlayer.idleTimer);
 
-    serverPlayer.audioPlayer.once(AudioPlayerStatus.Idle, (oldState, newState) => {
-        clearInterval(timeOutCheckPlaying);
-        clearTimeout(serverPlayer.idleTimer);
-
+    serverPlayer.audioPlayer.once(AudioPlayerStatus.Idle, (_oldState, _newState) => {
         serverPlayer.idleTimer = setTimeout(() => {
             serverPlayer.voiceConnection.disconnect();
         }, 15 * 60 * 1000); // 15 minutes
