@@ -44,16 +44,18 @@ sophi.on('messageCreate', async (message) => {
             break;
         }
 
-        if (!serverPlayers.has(message.guildId)) {
-            serverPlayers.set(message.guildId, new ServerPlayer());
+        const guildId = message.guildId;
+
+        if (!serverPlayers.has(guildId)) {
+            serverPlayers.set(guildId, new ServerPlayer(guildId));
             const owner = await message.guild.fetchOwner();
             logger.info(
-                `Novo servidor: '${message.guild.name}'(${message.guildId}), total: ${serverPlayers.size}.` +
+                `Novo servidor: '${message.guild.name}'(${guildId}), total: ${serverPlayers.size}.` +
                     ` Dono: '${owner.user.username}'(${owner.id})`
             );
         }
 
-        const serverPlayer = serverPlayers.get(message.guildId);
+        const serverPlayer = serverPlayers.get(guildId);
 
         serverPlayer.mutex.runExclusive(async () => {
             try {
@@ -62,7 +64,7 @@ sophi.on('messageCreate', async (message) => {
                 if (e instanceof SophiError) {
                     message.reply(e.message);
                 } else {
-                    logger.error(`Erro ao processar a mensagem: "${normalizedMessage}"`, e);
+                    logger.error(`Erro ao processar a mensagem: "${normalizedMessage}" servidor ${guildId}`, e);
                 }
             }
         });

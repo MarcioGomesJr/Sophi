@@ -13,7 +13,11 @@ const PlaylistEntry = require('./PlaylistEntry');
 const logger = require('../util/logger');
 
 class ServerPlayer {
-    constructor() {
+    /**
+     *
+     * @param {number} guildId The guild this player is responsible for
+     */
+    constructor(guildId) {
         /**
          * @type {PlaylistEntry[]}
          */
@@ -57,6 +61,11 @@ class ServerPlayer {
          * @type {Mutex}
          */
         this.mutex = withTimeout(new Mutex(), 100 * 1000);
+
+        /**
+         * @type {number}
+         */
+        this.guildId = guildId;
     }
 
     /**
@@ -89,7 +98,7 @@ class ServerPlayer {
                 this.audioPlayer.stop();
             }
         }
- 
+
         return removed;
     }
 

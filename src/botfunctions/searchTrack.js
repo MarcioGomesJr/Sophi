@@ -101,7 +101,7 @@ async function searchSpotify(spotifyLink) {
             return searchSpotifyTrack(trackData.body);
         }
     } catch (e) {
-        logger.error(`Erro ao buscar música pelo link do spotify: ${spotifyLink}`, e);
+        logger.error(`Erro ao buscar música pelo link do spotify: "${spotifyLink}"`, e);
         return [null, 'Esse não parece ser um link válido do spotify =x'];
     }
 }

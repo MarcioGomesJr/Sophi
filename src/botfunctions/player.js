@@ -15,7 +15,7 @@ async function radin(serverPlayer, sendMessage = true) {
     if (!playlistEntry) {
         logger.warn(
             `Um objeto de PlaylistEntry era esperado! playlist ${serverPlayer.playlist.length}` +
-                ` index: ${serverPlayer.currentSongIndex}`
+                ` index: ${serverPlayer.currentSongIndex} server: ${serverPlayer.guildId}`
         );
         return;
     }
@@ -96,8 +96,6 @@ async function playReq(serverPlayer, playlistEntry, sendMessage) {
             serverPlayer.voiceConnection.rejoin(joinOptions);
         }
 
-        const connection = serverPlayer.voiceConnection;
-        const audioPlayer = serverPlayer.audioPlayer;
         if (sendMessage) {
             message.channel.send(
                 `Está tocando: ${selectedSong.title} (${selectedSong.url}) (${selectedSong.durationRaw})\n` +
@@ -109,8 +107,8 @@ async function playReq(serverPlayer, playlistEntry, sendMessage) {
             inputType: stream.type,
         });
 
-        audioPlayer.play(resource);
-        connection.subscribe(audioPlayer);
+        serverPlayer.audioPlayer.play(resource);
+        serverPlayer.voiceConnection.subscribe(serverPlayer.audioPlayer);
 
         logger.info(
             `Tocando '${selectedSong.title}' (${selectedSong.durationRaw}) a pedido de '${message.author.username}'` +
@@ -119,7 +117,7 @@ async function playReq(serverPlayer, playlistEntry, sendMessage) {
 
         return true;
     } catch (e) {
-        logger.error(`Erro ao reproduzir música "${selectedSong.title}"`, e);
+        logger.error(`Erro ao reproduzir música "${selectedSong.title}" server ${serverPlayer.guildId}`, e);
         message.channel.send(
             `Não foi possível reproduzir a música (${selectedSong.title})\n` +
                 `Provavelmente tem restrição de idade ou está privado @w@`

@@ -51,11 +51,11 @@ async function playOrAddToPlaylist(message, serverPlayer, ytInfos, asNext = fals
         serverPlayer.addToPlaylist(playlistEntry, asNext);
     });
 
+    logger.info(`Adicionados ${ytInfos.length} itens na playlist`);
+
     if (playlistHasEnded) {
         await radin(serverPlayer);
     }
-
-    logger.info(`Adicionados ${ytInfos.length} itens à playlist`);
 }
 
 /**

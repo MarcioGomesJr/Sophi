@@ -1,4 +1,5 @@
 const { createLogger, format, transports } = require('winston');
+require('winston-daily-rotate-file');
 const { combine, timestamp, label, printf, errors } = format;
 
 const myFormat = printf(({ level, message, label, timestamp, stack }) => {
@@ -8,12 +9,15 @@ const myFormat = printf(({ level, message, label, timestamp, stack }) => {
 
 const logger = createLogger({
     level: 'info',
-    format: combine(label({ label: 'sophi' }), errors({ stack: true }), timestamp(), myFormat),
+    format: combine(label({ label: 'sophi' }), timestamp(), errors({ stack: true }), myFormat),
     transports: [
         new transports.Console(),
-        // new transports.File({
-        //     filename: 'sophi.log',
-        // }),
+        new transports.DailyRotateFile({
+            filename: 'logs/sophi-%DATE%.log',
+            datePattern: 'YYYY-MM-DD',
+            zippedArchive: true,
+            maxFiles: '14d',
+        }),
     ],
 });
 
