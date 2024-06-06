@@ -16,7 +16,7 @@ const { formatDuration } = require('../util/formatUtil');
  * @returns {Promise<any>}
  */
 async function playOrAddToPlaylist(message, serverPlayer, ytInfos, asNext = false) {
-    ytInfos = ytInfos.filter((ytInfo) => {
+    const filteredInfos = ytInfos.filter((ytInfo) => {
         // 2 hours
         if (ytInfo.durationInSec > 7200) {
             message.reply(`O vídeo ${ytInfo.title} tem mais de duas horas! Muito longo uwu`);
