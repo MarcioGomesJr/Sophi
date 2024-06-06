@@ -16,44 +16,55 @@ const logger = require('../util/logger');
  */
 async function playOrAddToPlaylist(message, serverPlayer, ytInfos, asNext = false) {
     ytInfos = ytInfos.filter((ytInfo) => {
-        if (ytInfo.durationInSec > 120 * 60) {
-            message.reply(`Aaaaaaaaaa o vídeo ${ytInfo.title} tem mais de duas horas! Muito loooongo uwu`);
+        // 2 hours
+        if (ytInfo.durationInSec > 7200) {
+            message.reply(`O vídeo ${ytInfo.title} tem mais de duas horas! Muito longo uwu`);
             return false;
         }
         return true;
     });
+    if (filteredInfos.length === 0) {
+        return;
+    }
 
-    const playlistHasEnded = serverPlayer.playlistHasEnded();
-    const trimed = trimPlaylist(serverPlayer, ytInfos, limit, playlistHasEnded);
+    const trimed = trimPlaylist(serverPlayer, filteredInfos, limit);
 
     if (trimed) {
-        if (ytInfos.length === 0) {
-            message.reply(`A playlist já está cheia! O Tamanho máximo é de ${limit} @w@`);
+        message.reply(
+            filteredInfos.length === 0
+                ? `A playlist já está cheia! O tamanho máximo é de ${limit} @w@`
+                : `A playlist está bem grande! Limitei seu pedido a ${filteredInfos.length} música(s) @w@`
+        );
+        if (filteredInfos.length === 0) {
             return;
-        } else {
-            message.reply(`A playlist está bem grande! Limitei seu pedido à ${ytInfos.length} musica(s) @w@`);
         }
     }
 
-    if (ytInfos.length > 1) {
+    if (filteredInfos.length > 1) {
         message.reply(
-            `Um total de (${ytInfos.length}) músicas foram adicionadas ${asNext ? 'como as próximas' : ''} na queue e.e`
+            `Um total de ${filteredInfos.length} músicas foram adicionadas ${
+                asNext ? 'como as próximas' : ''
+            } na fila e.e`
         );
-    } else if (!playlistHasEnded) {
+    } else if (!serverPlayer.playlistHasEnded()) {
         message.reply(
-            `Sua música '${ytInfos[0].title}' (${ytInfos[0].durationRaw}) foi adicionada` +
-                `${asNext ? 'como a próxima' : ''} na queue e.e`
+            `Sua música '${filteredInfos[0].title}' (${filteredInfos[0].durationRaw}) foi adicionada ${
+                asNext ? 'como a próxima' : ''
+            } na fila e.e`
         );
     }
 
-    ytInfos.forEach((ytInfo) => {
+    let totalMinutes = 0;
+    filteredInfos.forEach((ytInfo) => {
+        totalMinutes += ytInfo.durationInSec;
+
         const playlistEntry = new PlaylistEntry(message, ytInfo);
         serverPlayer.addToPlaylist(playlistEntry, asNext);
     });
 
-    logger.info(`Adicionados ${ytInfos.length} itens na playlist`);
+    logger.info(`Adicionados ${filteredInfos.length} itens à playlist. Total em minutos: ${totalMinutes}`);
 
-    if (playlistHasEnded) {
+    if (serverPlayer.playlistHasEnded()) {
         await radin(serverPlayer);
     }
 }
@@ -63,11 +74,10 @@ async function playOrAddToPlaylist(message, serverPlayer, ytInfos, asNext = fals
  * @param {ServerPlayer} serverPlayer
  * @param {YouTubeVideo[]} ytInfos
  * @param {number} limit
- * @param {boolean} playlistHasEnded
  * @returns {boolean}
  */
-function trimPlaylist(serverPlayer, ytInfos, limit, playlistHasEnded) {
-    const toBePlayed = serverPlayer.playlist.length - (serverPlayer.currentSongIndex + (playlistHasEnded ? 0 : 1));
+function trimPlaylist(serverPlayer, ytInfos, limit) {
+    const toBePlayed = serverPlayer.toBePlayed();
 
     if (toBePlayed + ytInfos.length > limit) {
         const toAdd = Math.max(limit - toBePlayed, 0);

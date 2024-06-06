@@ -267,6 +267,17 @@ class ServerPlayer {
             this.timesPlayingToNoOne = 0;
         }
     }
+
+    /**
+     * Calculates how many entries are left in the playlist
+     * @returns {number}
+     */
+    toBePlayed() {
+        if (this.playlistHasEnded) {
+            return 0;
+        }
+        return this.playlist.length - this.currentSongIndex;
+    }
 }
 
 module.exports = ServerPlayer;
