@@ -108,7 +108,7 @@ async function playReq(serverPlayer, playlistEntry, sendMessage) {
         });
 
         serverPlayer.audioPlayer.play(resource);
-        serverPlayer.voiceConnection.subscribe(serverPlayer.audioPlayer);
+        serverPlayer.playerSubscription = serverPlayer.voiceConnection.subscribe(serverPlayer.audioPlayer);
 
         logger.info(
             `Tocando '${selectedSong.title}' (${selectedSong.durationRaw}) a pedido de '${message.author.username}'` +

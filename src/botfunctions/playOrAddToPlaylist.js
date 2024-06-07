@@ -41,13 +41,14 @@ async function playOrAddToPlaylist(message, serverPlayer, ytInfos, asNext = fals
         }
     }
 
+    const playlistHasEnded = serverPlayer.playlistHasEnded();
     if (filteredInfos.length > 1) {
         message.reply(
             `Um total de ${filteredInfos.length} músicas foram adicionadas ${
                 asNext ? 'como as próximas' : ''
             } na fila e.e`
         );
-    } else if (!serverPlayer.playlistHasEnded()) {
+    } else if (!playlistHasEnded) {
         message.reply(
             `Sua música '${filteredInfos[0].title}' (${filteredInfos[0].durationRaw}) foi adicionada ${
                 asNext ? 'como a próxima' : ''
@@ -65,7 +66,7 @@ async function playOrAddToPlaylist(message, serverPlayer, ytInfos, asNext = fals
 
     logger.info(`Adicionados ${filteredInfos.length} itens à playlist. Tempo: ${formatDuration(totalMinutes)}`);
 
-    if (serverPlayer.playlistHasEnded()) {
+    if (playlistHasEnded) {
         await radin(serverPlayer);
     }
 }

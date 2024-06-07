@@ -4,7 +4,7 @@ const SophiError = require('./src/domain/SophiError');
 const version = require('./package.json').version;
 const logger = require('./src/util/logger');
 
-const token = require('./src/token').token;
+const { token, prefix } = require('./src/token');
 const allCommands = require('./src/commands/allCommands');
 
 logger.info(`Starting up bot. Version: ${version}.`);
@@ -21,8 +21,10 @@ sophi.on('ready', () => {
     logger.info(`Logged in as ${sophi.user.tag}!`);
 });
 
+const commandPrefix = prefix ?? '-';
+
 sophi.on('messageCreate', async (message) => {
-    if (message.author.bot || message.content[0] !== '-' || message.content.length < 2) {
+    if (message.author.bot || message.content[0] !== commandPrefix || message.content.length < 2) {
         return;
     }
 

@@ -4,6 +4,7 @@ const {
     VoiceConnection,
     AudioPlayer,
     AudioPlayerStatus,
+    PlayerSubscription,
 } = require('@discordjs/voice');
 const { Message } = require('discord.js');
 const { withTimeout, Mutex } = require('async-mutex');
@@ -42,6 +43,11 @@ class ServerPlayer {
          * @type {VoiceConnection?}
          */
         this.voiceConnection = null;
+
+        /**
+         * @type {PlayerSubscription?}
+         */
+        this.playerSubscription = null;
 
         /**
          * @type {AudioPlayer}
@@ -273,7 +279,7 @@ class ServerPlayer {
      * @returns {number}
      */
     toBePlayed() {
-        if (this.playlistHasEnded) {
+        if (this.playlistHasEnded()) {
             return 0;
         }
         return this.playlist.length - this.currentSongIndex;

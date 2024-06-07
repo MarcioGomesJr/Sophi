@@ -7,6 +7,7 @@ const remove = require('./remove');
 const clear = require('./clear');
 const goto = require('./goto');
 const shuffle = require('./shuffle');
+const playHere = require('./playHere');
 const { search, searchNext } = require('./searchSong');
 
 const allCommands = [
@@ -23,6 +24,7 @@ const allCommands = [
     shuffle,
     search,
     searchNext,
+    playHere,
 ];
 
 module.exports = allCommands;
