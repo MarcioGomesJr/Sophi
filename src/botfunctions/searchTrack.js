@@ -189,17 +189,22 @@ async function searchYoutubePlaylist(playlistUrl) {
     /**
      * @type {playdl.YouTubeVideo[]}
      */
-    let videos = null;
+    const videos = [];
 
     try {
         const playlistInfo = await playdl.playlist_info(playlistUrl, { incomplete: true });
-        await playlistInfo.fetch();
-        videos = playlistInfo.page(1);
+        await playlistInfo.fetch(playlistLimit);
+
+        let index = 1;
+        while (videos.length < playlistLimit && index <= playlistInfo.total_pages) {
+            videos.push(...playlistInfo.page(index));
+            index++;
+        }
     } catch (e) {
         logger.error(`Erro ao obter músicas da playlist: "${playlistUrl}"`, e);
     }
 
-    if (!videos) {
+    if (videos.length === 0) {
         return [null, 'Infelizmente ocorreu um erro ao ler os vídeos dessa playlist do YouTube aa'];
     }
 

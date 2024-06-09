@@ -60,16 +60,22 @@ sophi.on('messageCreate', async (message) => {
         const serverPlayer = serverPlayers.get(guildId);
 
         serverPlayer.mutex.runExclusive(async () => {
+            const commandoUserServer =
+                `'${normalizedMessage}' do usuário '${message.author.username}'(${message.author.id})` +
+                ` no servidor '${message.guild.name}'(${guildId})`;
             try {
+                logger.info(`Executando comando ${commandoUserServer}`);
                 await command.execute(message, argument, serverPlayer);
             } catch (e) {
                 if (e instanceof SophiError) {
                     message.reply(e.message);
                 } else {
-                    logger.error(`Erro ao processar a mensagem: "${normalizedMessage}" servidor ${guildId}`, e);
+                    logger.error(`Erro ao processar a mensagem: "${commandoUserServer}`, e);
                 }
             }
         });
+
+        break;
     }
 });
 
