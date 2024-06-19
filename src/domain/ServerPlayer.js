@@ -139,15 +139,16 @@ class ServerPlayer {
             this.checkValidIndex(index);
         }
 
+        this.setCurrentSongIndex(index);
+
         if (!this.playlistHasEnded()) {
             this.getCurrentEntry().stopRadin = true;
-            this.setCurrentSongIndex(index);
             this.audioPlayer.stop();
-        } else {
-            this.setCurrentSongIndex(index);
-        }
 
-        return true;
+            return true;
+        } else {
+            return false;
+        }
     }
 
     /**

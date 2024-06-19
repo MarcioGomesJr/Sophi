@@ -19,10 +19,7 @@ const logger = require('../util/logger');
 async function radin(serverPlayer, sendMessage = true) {
     const playlistEntry = serverPlayer.getCurrentEntry();
     if (!playlistEntry) {
-        logger.warn(
-            `Um objeto de PlaylistEntry era esperado! playlist ${serverPlayer.playlist.length}` +
-                ` index: ${serverPlayer.currentSongIndex} server: ${serverPlayer.guildId}`
-        );
+        logger.warn(`Playlist tinha acabado ${serverPlayer.guildId}`);
         return;
     }
 
@@ -86,8 +83,13 @@ async function playReq(serverPlayer, playlistEntry, sendMessage) {
         const stream = ytdl(selectedSong.url, {
             filter: 'audioonly',
         });
+
         stream.on('error', (error) => {
-            logger.error('Error from playStream:', error);
+            logger.error(`Erro em playstream música "${selectedSong.title}" server ${serverPlayer.guildId}`, error);
+            stream.removeAllListeners();
+            if (serverPlayer.skipToSong()) {
+                radin(serverPlayer);
+            }
         });
 
         const joinOptions = {
@@ -119,9 +121,13 @@ async function playReq(serverPlayer, playlistEntry, sendMessage) {
         serverPlayer.audioPlayer.play(resource);
         serverPlayer.playerSubscription = serverPlayer.voiceConnection.subscribe(serverPlayer.audioPlayer);
 
+        serverPlayer.audioPlayer.on('error', (error) => {
+            logger.warn('Ignorando erro audioplayer. Listener da stream deve tratar', error);
+        });
+
         logger.info(
             `Tocando '${selectedSong.title}' (${selectedSong.durationRaw}) a pedido de '${message.author.username}'` +
-                `(${message.author.id}) no servidor '${message.guild.name}'(${message.guildId})`
+                `(${message.author.id}) no servidor '${message.guild.name}'(${serverPlayer.guildId})`
         );
 
         return true;
