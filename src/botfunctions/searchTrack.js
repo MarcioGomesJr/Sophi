@@ -157,6 +157,7 @@ async function searchYoutubeLink(searchTerm) {
         const durationInSec = Number.parseInt(basicInfo.videoDetails.lengthSeconds);
 
         const ytInfo = {
+            id: basicInfo.uid,
             title: basicInfo.videoDetails.title,
             url: searchTerm,
             channel: {

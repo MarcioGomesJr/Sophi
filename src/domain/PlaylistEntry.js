@@ -1,11 +1,11 @@
 const { Message } = require('discord.js');
-const playdl = require('play-dl');
+const {YouTubeVideo} = require('play-dl');
 
 class PlaylistEntry {
     /**
      *
      * @param {Message} message
-     * @param {playdl.YouTubeVideo} ytInfo
+     * @param {YouTubeVideo} ytInfo
      */
     constructor(message, ytInfo) {
         /**
@@ -14,7 +14,7 @@ class PlaylistEntry {
         this.message = message;
 
         /**
-         * @type {playdl.YouTubeVideo}
+         * @type {YouTubeVideo}
          */
         this.ytInfo = ytInfo;
 

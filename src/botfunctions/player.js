@@ -1,5 +1,11 @@
-const play = require('play-dl');
-const { joinVoiceChannel, createAudioResource, AudioPlayerStatus, VoiceConnectionStatus } = require('@discordjs/voice');
+const ytdl = require('ytdl-core');
+const {
+    joinVoiceChannel,
+    createAudioResource,
+    AudioPlayerStatus,
+    VoiceConnectionStatus,
+    StreamType,
+} = require('@discordjs/voice');
 const ServerPlayer = require('../domain/ServerPlayer');
 const PlaylistEntry = require('../domain/PlaylistEntry');
 const logger = require('../util/logger');
@@ -74,12 +80,15 @@ function goToNextSong(serverPlayer) {
  * @returns {Promise<boolean>}
  */
 async function playReq(serverPlayer, playlistEntry, sendMessage) {
-    const message = playlistEntry.message;
-    const selectedSong = playlistEntry.ytInfo;
+    const { message, ytInfo: selectedSong, originalVoiceChannelId: channelId } = playlistEntry;
 
     try {
-        const stream = await play.stream(selectedSong.url);
-        const channelId = playlistEntry.originalVoiceChannelId;
+        const stream = ytdl(selectedSong.url, {
+            filter: 'audioonly',
+        });
+        stream.on('error', (error) => {
+            logger.error('Error from playStream:', error);
+        });
 
         const joinOptions = {
             channelId,
@@ -103,8 +112,8 @@ async function playReq(serverPlayer, playlistEntry, sendMessage) {
             );
         }
 
-        let resource = createAudioResource(stream.stream, {
-            inputType: stream.type,
+        let resource = createAudioResource(stream, {
+            inputType: StreamType.WebmOpus,
         });
 
         serverPlayer.audioPlayer.play(resource);
