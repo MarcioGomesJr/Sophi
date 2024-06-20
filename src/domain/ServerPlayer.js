@@ -139,14 +139,14 @@ class ServerPlayer {
             this.checkValidIndex(index);
         }
 
-        this.setCurrentSongIndex(index);
-
         if (!this.playlistHasEnded()) {
             this.getCurrentEntry().stopRadin = true;
+            this.setCurrentSongIndex(index);
             this.audioPlayer.stop();
 
             return true;
         } else {
+            this.setCurrentSongIndex(index);
             return false;
         }
     }

@@ -27,6 +27,11 @@ class PlaylistEntry {
          * @type {string | undefined}
          */
         this.originalVoiceChannelId = message.member?.voice.channel?.id;
+
+        /**
+         * @type {number}
+         */
+        this.reties = 0;
     }
 }
 

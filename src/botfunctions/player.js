@@ -85,11 +85,7 @@ async function playReq(serverPlayer, playlistEntry, sendMessage) {
         });
 
         stream.on('error', (error) => {
-            logger.error(`Erro em playstream música "${selectedSong.title}" server ${serverPlayer.guildId}`, error);
-            stream.removeAllListeners();
-            if (serverPlayer.skipToSong()) {
-                radin(serverPlayer);
-            }
+            logger.error(`Erro em playstream música "${selectedSong.title}" server ${serverPlayer.guildId}.`, error);
         });
 
         const joinOptions = {
@@ -122,7 +118,21 @@ async function playReq(serverPlayer, playlistEntry, sendMessage) {
         serverPlayer.playerSubscription = serverPlayer.voiceConnection.subscribe(serverPlayer.audioPlayer);
 
         serverPlayer.audioPlayer.on('error', (error) => {
-            logger.warn('Ignorando erro audioplayer. Listener da stream deve tratar', error);
+            stream.removeAllListeners();
+            logger.warn(
+                `Erro em audioplayer música "${selectedSong.title}" server ${serverPlayer.guildId}. Listener da stream deve tratar.`,
+                error
+            );
+            playlistEntry.reties++;
+
+            let index = serverPlayer.currentSongIndex;
+            if (playlistEntry.reties > 1) {
+                message.index++;
+            }
+
+            if (serverPlayer.skipToSong(index)) {
+                radin(serverPlayer);
+            }
         });
 
         logger.info(
