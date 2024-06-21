@@ -111,23 +111,30 @@ async function playReq(serverPlayer, playlistEntry, sendMessage) {
         }
 
         let resource = createAudioResource(stream, {
-            inputType: StreamType.WebmOpus,
+            inputType: StreamType.Arbitrary,
         });
 
         serverPlayer.audioPlayer.play(resource);
         serverPlayer.playerSubscription = serverPlayer.voiceConnection.subscribe(serverPlayer.audioPlayer);
 
+        let errorProcessed = false;
         serverPlayer.audioPlayer.on('error', (error) => {
-            stream.removeAllListeners();
+            if (errorProcessed) {
+                return;
+            }
+            errorProcessed = true;
+            serverPlayer.audioPlayer.removeAllListeners();
+
             logger.warn(
-                `Erro em audioplayer música "${selectedSong.title}" server ${serverPlayer.guildId}. Listener da stream deve tratar.`,
+                `Erro em audioplayer música "${selectedSong.title}" server ${serverPlayer.guildId}.` +
+                    ` Tentativa ${playlistEntry.reties}`,
                 error
             );
             playlistEntry.reties++;
 
             let index = serverPlayer.currentSongIndex;
             if (playlistEntry.reties > 1) {
-                message.index++;
+                index = null;
             }
 
             if (serverPlayer.skipToSong(index)) {
