@@ -1,4 +1,6 @@
 const ytdl = require('ytdl-core');
+const fs = require('fs');
+const path = require('path');
 const {
     joinVoiceChannel,
     createAudioResource,
@@ -80,12 +82,29 @@ async function playReq(serverPlayer, playlistEntry, sendMessage) {
     const { message, ytInfo: selectedSong, originalVoiceChannelId: channelId } = playlistEntry;
 
     try {
+        const filePath = path.join('.', 'audio_cache', `${serverPlayer.guildId}.mp4`).toString();
+        if (fs.existsSync(filePath)) {
+            fs.rmSync(filePath);
+        }
+
         const stream = ytdl(selectedSong.url, {
             filter: 'audioonly',
         });
+        const writeStream = fs.createWriteStream(filePath);
+        stream.pipe(writeStream);
 
-        stream.on('error', (error) => {
-            logger.error(`Erro em playstream música "${selectedSong.title}" server ${serverPlayer.guildId}.`, error);
+        await new Promise((resolve, reject) => {
+            writeStream.on('finish', resolve);
+            writeStream.on('error', reject);
+            stream.on('error', (error) => {
+                logger.error(
+                    `Erro em playstream música "${selectedSong.title}" server ${serverPlayer.guildId}.`,
+                    error
+                );
+                reject(error);
+                stream.unpipe();
+                writeStream.close();
+            });
         });
 
         const joinOptions = {
@@ -110,7 +129,7 @@ async function playReq(serverPlayer, playlistEntry, sendMessage) {
             );
         }
 
-        let resource = createAudioResource(stream, {
+        let resource = createAudioResource(filePath, {
             inputType: StreamType.Arbitrary,
         });
 
@@ -126,18 +145,12 @@ async function playReq(serverPlayer, playlistEntry, sendMessage) {
             serverPlayer.audioPlayer.removeAllListeners();
 
             logger.warn(
-                `Erro em audioplayer música "${selectedSong.title}" server ${serverPlayer.guildId}.` +
-                    ` Tentativa ${playlistEntry.reties}`,
+                `Erro em audioplayer música "${selectedSong.title}" server ${serverPlayer.guildId}.`,
                 error
             );
             playlistEntry.reties++;
 
-            let index = serverPlayer.currentSongIndex;
-            if (playlistEntry.reties > 1) {
-                index = null;
-            }
-
-            if (serverPlayer.skipToSong(index)) {
+            if (serverPlayer.skipToSong()) {
                 radin(serverPlayer);
             }
         });

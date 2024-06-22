@@ -143,12 +143,11 @@ class ServerPlayer {
             this.getCurrentEntry().stopRadin = true;
             this.setCurrentSongIndex(index);
             this.audioPlayer.stop();
-
-            return true;
         } else {
             this.setCurrentSongIndex(index);
-            return false;
         }
+
+        return true;
     }
 
     /**
