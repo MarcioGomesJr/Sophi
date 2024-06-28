@@ -44,6 +44,8 @@ async function playOrAddToPlaylist(message, serverPlayer, ytInfos, asNext = fals
         .slice(serverPlayer.currentSongIndex)
         .map((entry) => entry.ytInfo.durationInSec)
         .reduce((acc, val) => acc + val, 0);
+    const inFront = serverPlayer.playlist.length - serverPlayer.currentSongIndex - 1;
+    const position = inFront > 0 ? ` atrás de ${inFront} pedido(s)` : '';
 
     let totalSeconds = 0;
     for (const ytInfo of filteredInfos) {
@@ -62,14 +64,14 @@ async function playOrAddToPlaylist(message, serverPlayer, ytInfos, asNext = fals
 
     if (filteredInfos.length > 1) {
         message.reply(
-            `Um total de ${filteredInfos.length} músicas (${durationStr}) foram adicionadas ${
-                asNext ? 'como as próximas' : ''
+            `Um total de ${filteredInfos.length} músicas (${durationStr}) foram adicionadas${
+                asNext ? ' como as próximas' : position
             } na fila e.e`
         );
     } else if (!playlistHasEnded) {
         message.reply(
-            `Sua música '${filteredInfos[0].title}' (${durationStr}) foi adicionada ${
-                asNext ? 'como a próxima' : ''
+            `Sua música '${filteredInfos[0].title}' (${durationStr}) foi adicionada${
+                asNext ? ' como a próxima' : position
             } na fila e.e`
         );
     }

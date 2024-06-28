@@ -16,15 +16,16 @@ const pause = new Command(
             clearInterval(serverPlayer.pauseTimer);
 
             audioPlayer.unpause();
-            message.channel.send("It's dare U-U");
+            message.channel.send('It`s dare U-U');
         } else if (serverPlayer.playerStatus() === AudioPlayerStatus.Playing) {
             audioPlayer.pause();
             message.channel.send('PAUSO! O-o');
 
             serverPlayer.pauseTimer = setTimeout(() => {
+                message.channel.send('Fiquei muito tempo pausada, limpei a platylist uwu');
                 serverPlayer.clearPlaylist();
                 audioPlayer.stop();
-            }, 30 * 60 * 1000);
+            }, 60 * 60 * 1000); // One hour
         }
     }
 );
