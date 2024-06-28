@@ -1,34 +1,50 @@
-const play = require('play-dl');
-const { joinVoiceChannel, createAudioResource, AudioPlayerStatus, VoiceConnectionStatus } = require('@discordjs/voice');
+const ytdl = require('ytdl-core');
+const fs = require('fs');
+const path = require('path');
+const {
+    joinVoiceChannel,
+    createAudioResource,
+    AudioPlayerStatus,
+    VoiceConnectionStatus,
+    StreamType,
+} = require('@discordjs/voice');
+const ServerPlayer = require('../domain/ServerPlayer');
+const PlaylistEntry = require('../domain/PlaylistEntry');
+const logger = require('../util/logger');
 
-async function radin(serverPlayer, sendMessage=true) {
+/**
+ *
+ * @param {ServerPlayer} serverPlayer
+ * @param {boolean} sendMessage
+ * @returns {Promise<void>}
+ */
+async function radin(serverPlayer, sendMessage = true) {
     const playlistEntry = serverPlayer.getCurrentEntry();
+    if (!playlistEntry) {
+        logger.warn(`Playlist tinha acabado ${serverPlayer.guildId}`);
+        return;
+    }
+
     const sucesso = await playReq(serverPlayer, playlistEntry, sendMessage);
-    clearTimeout(serverPlayer.idleTimer);
 
     if (!sucesso) {
         goToNextSong(serverPlayer);
         return;
     }
 
-    const timeOutCheckPlaying = setInterval(() => {
-        if (serverPlayer.notPlayingOrPaused()) {
-            serverPlayer.skipToSong(serverPlayer.currentSongIndex, false);
-        }
-    }, 5000); // 5 seconds
+    clearTimeout(serverPlayer.idleTimer);
 
-    serverPlayer.audioPlayer.once(AudioPlayerStatus.Idle, (oldState, newState) => {
-        clearInterval(timeOutCheckPlaying);
+    serverPlayer.audioPlayer.once(AudioPlayerStatus.Idle, (_oldState, _newState) => {
         serverPlayer.idleTimer = setTimeout(() => {
             serverPlayer.voiceConnection.disconnect();
-        }, 900000); // 15 minutes
+        }, 15 * 60 * 1000); // 15 minutes
 
         setTimeout(() => {
             const songCurrentIndex = serverPlayer.playlist.indexOf(playlistEntry);
             if (songCurrentIndex !== -1) {
                 serverPlayer.removeFromPlaylist(songCurrentIndex);
             }
-        }, 10800000); // Three hours
+        }, 4 * 60 * 60 * 1000); // Four hours
 
         serverPlayer.checkPlayingToNoOne(playlistEntry.originalVoiceChannelId, playlistEntry.message);
 
@@ -40,8 +56,13 @@ async function radin(serverPlayer, sendMessage=true) {
     });
 }
 
+/**
+ *
+ * @param {ServerPlayer} serverPlayer
+ * @returns {Promise<void>}
+ */
 function goToNextSong(serverPlayer) {
-    serverPlayer.currentSongIndex++;
+    serverPlayer.setCurrentSongIndex(serverPlayer.currentSongIndex + 1);
 
     if (serverPlayer.playlistHasEnded()) {
         return;
@@ -50,52 +71,103 @@ function goToNextSong(serverPlayer) {
     radin(serverPlayer);
 }
 
+/**
+ *
+ * @param {ServerPlayer} serverPlayer
+ * @param {PlaylistEntry} playlistEntry
+ * @param {boolean} sendMessage
+ * @returns {Promise<boolean>}
+ */
 async function playReq(serverPlayer, playlistEntry, sendMessage) {
-    const message = playlistEntry.message;
-    const selectedSong = playlistEntry.ytInfo;
+    const { message, ytInfo: selectedSong, originalVoiceChannelId: channelId } = playlistEntry;
 
     try {
-        const stream = await play.stream(selectedSong.url);
-        const channelId = playlistEntry.originalVoiceChannelId;
+        const filePath = path.join(__dirname, '..', '..', 'audio_cache', `${serverPlayer.guildId}.mp4`).toString();
+        if (fs.existsSync(filePath)) {
+            fs.rmSync(filePath);
+        }
+
+        const stream = ytdl(selectedSong.url, {
+            filter: 'audioonly',
+        });
+        const writeStream = fs.createWriteStream(filePath);
+        stream.pipe(writeStream);
+
+        await new Promise((resolve, reject) => {
+            writeStream.on('finish', resolve);
+            writeStream.on('error', reject);
+            stream.on('error', (error) => {
+                logger.error(
+                    `Erro em playstream música "${selectedSong.title}" server ${serverPlayer.guildId}.`,
+                    error
+                );
+                reject(error);
+                stream.unpipe();
+                writeStream.close();
+            });
+        });
 
         const joinOptions = {
             channelId,
-            guildId : message.guild.id,
+            guildId: message.guild.id,
             adapterCreator: message.guild.voiceAdapterCreator,
-        }
+        };
 
-        if (!serverPlayer.voiceConnection || joinOptions.channelId !== serverPlayer.voiceConnection.joinConfig.channelId) {
+        if (
+            !serverPlayer.voiceConnection ||
+            joinOptions.channelId !== serverPlayer.voiceConnection.joinConfig.channelId
+        ) {
             serverPlayer.voiceConnection = joinVoiceChannel(joinOptions);
-        }
-        else if (serverPlayer.voiceConnection.state.status === VoiceConnectionStatus.Disconnected) {
+        } else if (serverPlayer.voiceConnection.state.status === VoiceConnectionStatus.Disconnected) {
             serverPlayer.voiceConnection.rejoin(joinOptions);
         }
 
-        const connection = serverPlayer.voiceConnection;
-        const audioPlayer = serverPlayer.audioPlayer;
         if (sendMessage) {
-            message.channel.send(`Está tocando: ${selectedSong.title} (${selectedSong.url})\nA pedido de: ${message.member.displayName}`);
+            message.channel.send(
+                `Está tocando: ${selectedSong.title} (${selectedSong.url}) (${selectedSong.durationRaw})\n` +
+                    `A pedido de: ${message.member.displayName}`
+            );
         }
 
-        let resource = createAudioResource(stream.stream, {
-            inputType: stream.type
+        let resource = createAudioResource(filePath, {
+            inputType: StreamType.Arbitrary,
         });
 
-        audioPlayer.play(resource);
-        connection.subscribe(audioPlayer);
+        serverPlayer.audioPlayer.play(resource);
+        serverPlayer.playerSubscription = serverPlayer.voiceConnection.subscribe(serverPlayer.audioPlayer);
 
-        // Correção temporária para https://github.com/discordjs/discord.js/issues/9185
-        connection.on('stateChange', (old_state, new_state) => {
-            if (old_state.status === VoiceConnectionStatus.Ready && new_state.status === VoiceConnectionStatus.Connecting) {
-                connection.configureNetworking();
+        let errorProcessed = false;
+        serverPlayer.audioPlayer.on('error', (error) => {
+            if (errorProcessed) {
+                return;
+            }
+            errorProcessed = true;
+            serverPlayer.audioPlayer.removeAllListeners();
+
+            logger.warn(
+                `Erro em audioplayer música "${selectedSong.title}" server ${serverPlayer.guildId}.`,
+                error
+            );
+            playlistEntry.reties++;
+
+            if (serverPlayer.skipToSong()) {
+                radin(serverPlayer);
             }
         });
 
+        logger.info(
+            `Tocando '${selectedSong.title}' (${selectedSong.durationRaw}) a pedido de '${message.author.username}'` +
+                `(${message.author.id}) no servidor '${message.guild.name}'(${serverPlayer.guildId})`
+        );
+
         return true;
-    } catch(e) {
-        console.log(`Erro ao reproduzir música "${selectedSong.title}": ${e}\n${e.stack}`);
-        message.channel.send(`Não foi possível reproduzir a música (${selectedSong.title})\nProvavelmente tem restrição de idade ou está privado @w@`);
-        
+    } catch (e) {
+        logger.error(`Erro ao reproduzir música "${selectedSong.title}" server ${serverPlayer.guildId}`, e);
+        message.channel.send(
+            `Não foi possível reproduzir a música (${selectedSong.title})\n` +
+                `Provavelmente tem restrição de idade ou está privado @w@`
+        );
+
         return false;
     }
 }

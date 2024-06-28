@@ -1,13 +1,14 @@
 const Command = require('../domain/Command');
-const { EmbedBuilder } = require('discord.js');
+const ServerPlayer = require('../domain/ServerPlayer');
+const { EmbedBuilder, MessageReaction, User } = require('discord.js');
 const { messageIsCommand } = require('../util/commandUtil');
 
 const queue = new Command(
-    (message, normalizedMessage) => {
+    (_message, normalizedMessage) => {
         return messageIsCommand(normalizedMessage, ['queue', 'q']);
     },
 
-    async (message, argument, serverPlayer) => {
+    async (message, _argument, serverPlayer) => {
         if (serverPlayer.playlist.length < 1) {
             message.channel.send('Não tem nada tocando ou na playlist =(');
             return;
@@ -23,7 +24,6 @@ const queue = new Command(
             embeds: [playlistMessage],
         });
 
-        // TODO validar se assim está sempre indo na ordem certa
         await Promise.all([
             queueMessage.react('🏠'),
             queueMessage.react('⏪'),
@@ -32,36 +32,55 @@ const queue = new Command(
             queueMessage.react('⏩'),
         ]);
 
+        /**
+         *
+         * @param {MessageReaction} reaction
+         * @param {User} user
+         * @returns {void}
+         */
         const filter = (reaction, user) => {
             return user.id !== queueMessage.author.id && '🏠⏪◀️▶️⏩'.includes(reaction.emoji.name);
         };
+
         const collector = queueMessage.createReactionCollector({
             filter,
-            time: 300 * 1000,
+            time: 15 * 60 * 1000,
             max: 1000,
             dispose: true,
         });
 
-        const changePage = (reaction, user) => {
+        /**
+         *
+         * @param {MessageReaction} reaction
+         * @param {User} _user
+         * @returns {void}
+         */
+        const changePage = (reaction, _user) => {
             const emoji = reaction.emoji.name;
             numberOfPages = Math.ceil(serverPlayer.playlist.length / pageSize);
 
-            if (emoji === '🏠') {
-                page = Math.floor(serverPlayer.currentSongIndex / pageSize);
-            } else if (emoji === '⏪') {
-                page = 0;
-            } else if (emoji === '▶️') {
-                if (page + 1 === numberOfPages) {
-                    return;
-                }
-                page++;
-            } else if (emoji === '◀️') {
-                if (page === 0) {
-                    return;
-                }
-                page--;
-            } else {
-                page = numberOfPages - 1;
+            switch (emoji) {
+                case '🏠':
+                    page = Math.floor(serverPlayer.currentSongIndex / pageSize);
+                    break;
+                case '⏪':
+                    page = 0;
+                    break;
+                case '▶️':
+                    if (page + 1 >= numberOfPages) {
+                        return;
+                    }
+                    page++;
+                    break;
+                case '◀️':
+                    if (page <= 0) {
+                        return;
+                    }
+                    page--;
+                    break;
+                case '⏩':
+                    page = numberOfPages - 1;
+                    break;
             }
 
             const newQueue = buildQueueString(serverPlayer, page, pageSize, numberOfPages);
@@ -73,23 +92,34 @@ const queue = new Command(
     }
 );
 
+/**
+ *
+ * @param {ServerPlayer} serverPlayer
+ * @param {number} page
+ * @param {number} pageSize
+ * @param {number} numberOfPages
+ * @returns {string}
+ */
 function buildQueueString(serverPlayer, page, pageSize, numberOfPages) {
     const queueFirstIndex = page * pageSize;
 
     return (
-        serverPlayer.playlist
-            .slice(queueFirstIndex, queueFirstIndex + pageSize)
-            .reduce((acc, playlistEntry, index) => {
-                index += queueFirstIndex;
+        serverPlayer.playlist.slice(queueFirstIndex, queueFirstIndex + pageSize).reduce((acc, playlistEntry, index) => {
+            index += queueFirstIndex;
 
-                const ytInfo = playlistEntry.ytInfo;
-                const currentSongInfo = index === serverPlayer.currentSongIndex ? ' **-> Tocando atualmente :3**' : '';
+            const ytInfo = playlistEntry.ytInfo;
+            const currentSongInfo = index === serverPlayer.currentSongIndex ? ' **-> Tocando atualmente :3**' : '';
 
-                return acc + `${index + 1} - ${ytInfo.title} ${currentSongInfo}\n${ytInfo.url}\n`;
-            }, '') + `\n**${page + 1}/${numberOfPages}**`
+            return acc + `${index + 1} - ${ytInfo.title} (${ytInfo.durationRaw})${currentSongInfo}\n${ytInfo.url}\n`;
+        }, '') + `\n**${page + 1}/${numberOfPages}**`
     );
 }
 
+/**
+ *
+ * @param {string} nextSongs
+ * @returns {EmbedBuilder}
+ */
 function buildQueueEmbed(nextSongs) {
     return new EmbedBuilder()
         .setColor(0x1f85de)
