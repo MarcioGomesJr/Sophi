@@ -82,7 +82,7 @@ async function playReq(serverPlayer, playlistEntry, sendMessage) {
     const { message, ytInfo: selectedSong, originalVoiceChannelId: channelId } = playlistEntry;
 
     try {
-        const filePath = path.join('.', 'audio_cache', `${serverPlayer.guildId}.mp4`).toString();
+        const filePath = path.join(__dirname, '..', '..', 'audio_cache', `${serverPlayer.guildId}.mp4`).toString();
         if (fs.existsSync(filePath)) {
             fs.rmSync(filePath);
         }
